@@ -8,12 +8,20 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-blue?logo=apple" alt="macOS 14.0+">
-  <img src="https://img.shields.io/badge/swift-5.9-orange?logo=swift" alt="Swift 5.9">
-  <img src="https://img.shields.io/badge/rust-2021-brown?logo=rust" alt="Rust 2021">
-  <img src="https://img.shields.io/badge/whisper.cpp-integrated-green" alt="whisper.cpp">
-  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="MIT License">
-  <img src="https://img.shields.io/badge/version-0.2.0-informational" alt="Version 0.2.0">
+  <a href="https://github.com/rodnoy/orangenoteGUI/releases/latest">
+    <img src="https://img.shields.io/github/v/release/rodnoy/orangenoteGUI?style=for-the-badge&logo=apple&logoColor=white&label=Download%20for%20macOS&color=FF6600" alt="Download for macOS">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/rodnoy/orangenoteGUI/releases/latest"><img src="https://img.shields.io/github/v/release/rodnoy/orangenoteGUI?style=flat-square" alt="GitHub Release"></a>
+  <a href="https://github.com/rodnoy/orangenoteGUI/releases"><img src="https://img.shields.io/github/downloads/rodnoy/orangenoteGUI/total?style=flat-square&color=green" alt="GitHub Downloads"></a>
+  <a href="https://github.com/rodnoy/orangenoteGUI/actions"><img src="https://img.shields.io/github/actions/workflow/status/rodnoy/orangenoteGUI/release.yml?style=flat-square" alt="Build Status"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%2014.0%2B-blue?style=flat-square&logo=apple" alt="macOS 14.0+">
+  <img src="https://img.shields.io/badge/swift-5.9-orange?style=flat-square&logo=swift" alt="Swift 5.9">
+  <img src="https://img.shields.io/badge/rust-2021-brown?style=flat-square&logo=rust" alt="Rust 2021">
+  <img src="https://img.shields.io/badge/whisper.cpp-integrated-green?style=flat-square" alt="whisper.cpp">
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square" alt="MIT License">
 </p>
 
 ---
@@ -28,6 +36,18 @@
 - 📊 **Real-Time Progress** — Live progress tracking with segment-level updates
 - 🌙 **Dark Mode** — Full native dark mode support
 - 🔒 **100% Offline** — All processing happens locally on your Mac
+
+## 📥 Download
+
+<p align="center">
+  <a href="https://github.com/rodnoy/orangenoteGUI/releases/latest">
+    <img src="https://img.shields.io/github/v/release/rodnoy/orangenoteGUI?style=for-the-badge&logo=apple&logoColor=white&label=Download%20for%20macOS&color=FF6600" alt="Download for macOS">
+  </a>
+</p>
+
+> **Requirements:** macOS 14.0 (Sonoma) or later • Apple Silicon or Intel Mac
+>
+> Download the `.dmg` file, open it, and drag OrangeNote to your Applications folder.
 
 ## 📸 Screenshots
 
@@ -50,8 +70,8 @@
 
 ```bash
 # Clone with submodules (whisper.cpp)
-git clone --recursive https://github.com/your-org/orangenote.git
-cd orangenote
+git clone --recursive https://github.com/rodnoy/orangenoteGUI.git
+cd orangenoteGUI
 
 # Install dependencies, generate Xcode project, and open it
 make init
