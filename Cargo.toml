@@ -1,0 +1,19 @@
+[workspace]
+members = ["orangenote-core", "orangenote-ffi"]
+resolver = "2"
+
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+authors = ["OrangeNote Team"]
+
+[workspace.dependencies]
+anyhow = "1.0"
+thiserror = "1.0"
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = true

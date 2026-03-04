@@ -1,0 +1,17 @@
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+build/
+DerivedData/
+*.xcuserdata/
+
+# Rust
+target/
+
+# macOS
+.DS_Store
+*.swp
+
+# IDE
+.idea/
+.vscode/

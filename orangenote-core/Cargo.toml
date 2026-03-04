@@ -1,0 +1,37 @@
+[package]
+name = "orangenote-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Core library for audio transcription using whisper.cpp"
+links = "whisper"
+
+[lib]
+name = "orangenote_core"
+crate-type = ["lib"]
+
+[dependencies]
+anyhow.workspace = true
+thiserror.workspace = true
+log.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+# Audio decoding and resampling
+symphonia = { version = "0.5", features = ["all"] }
+hound = "3.5"
+
+# Whisper model download (optional)
+reqwest = { version = "0.11", features = ["stream"], optional = true }
+indicatif = { version = "0.17", optional = true }
+futures = { version = "0.3", optional = true }
+
+# Hashing for model verification
+sha2 = "0.10"
+hex = "0.4"
+
+[features]
+default = []
+whisper = ["reqwest", "indicatif", "futures"]
+
+[build-dependencies]

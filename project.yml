@@ -1,0 +1,109 @@
+name: OrangeNote
+options:
+  bundleIdPrefix: com.orangenote
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "15.0"
+  generateEmptyDirectories: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    SWIFT_OBJC_BRIDGING_HEADER: "OrangeNote/Bridge/OrangeNote-Bridging-Header.h"
+    HEADER_SEARCH_PATHS:
+      - "$(SRCROOT)/orangenote-ffi/include"
+    LIBRARY_SEARCH_PATHS:
+      - "$(SRCROOT)/target/universal/release"
+    OTHER_LDFLAGS:
+      - "-lorangenote_ffi"
+      - "-framework"
+      - "Accelerate"
+      - "-framework"
+      - "Foundation"
+      - "-framework"
+      - "Metal"
+      - "-framework"
+      - "MetalKit"
+      - "-framework"
+      - "Security"
+      - "-framework"
+      - "SystemConfiguration"
+      - "-framework"
+      - "CoreFoundation"
+      - "-lc++"
+      - "-lresolv"
+      - "-liconv"
+
+targets:
+  OrangeNote:
+    type: application
+    platform: macOS
+    sources:
+      - path: OrangeNote
+        excludes:
+          - "Scripts/**"
+          - "**/*.sh"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.orangenote.app
+        PRODUCT_NAME: OrangeNote
+        INFOPLIST_FILE: OrangeNote/Info.plist
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: OrangeNote/OrangeNote.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: true
+        CODE_SIGN_IDENTITY: "-"
+      configs:
+        Debug:
+          SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+        Release:
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+    preBuildScripts:
+      - name: "Build Rust FFI Library"
+        script: |
+          set -e
+
+          RUST_PROJECT_DIR="${SRCROOT}"
+          UNIVERSAL_DIR="${RUST_PROJECT_DIR}/target/universal/release"
+
+          cd "${RUST_PROJECT_DIR}"
+
+          # Ensure cargo is in PATH
+          export PATH="$HOME/.cargo/bin:$PATH"
+
+          # Install x86_64 target if not present
+          rustup target add x86_64-apple-darwin 2>/dev/null || true
+
+          # Build for arm64
+          cargo build --release --target aarch64-apple-darwin -p orangenote-ffi
+
+          # Build for x86_64
+          cargo build --release --target x86_64-apple-darwin -p orangenote-ffi
+
+          # Create universal binary
+          mkdir -p "${UNIVERSAL_DIR}"
+          lipo -create \
+            "target/aarch64-apple-darwin/release/liborangenote_ffi.a" \
+            "target/x86_64-apple-darwin/release/liborangenote_ffi.a" \
+            -output "${UNIVERSAL_DIR}/liborangenote_ffi.a"
+
+          echo "Universal library created at ${UNIVERSAL_DIR}/liborangenote_ffi.a"
+        basedOnDependencyAnalysis: false
+        outputFiles: []
+    info:
+      path: OrangeNote/Info.plist
+      properties:
+        CFBundleName: OrangeNote
+        CFBundleDisplayName: OrangeNote
+        CFBundleIdentifier: com.orangenote.app
+        CFBundleVersion: "1"
+        CFBundleShortVersionString: "0.1.0"
+        CFBundlePackageType: APPL
+        CFBundleExecutable: OrangeNote
+        LSMinimumSystemVersion: "14.0"
+        LSApplicationCategoryType: "public.app-category.productivity"
+        NSHighResolutionCapable: true
+    entitlements:
+      path: OrangeNote/OrangeNote.entitlements

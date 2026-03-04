@@ -1,0 +1,17 @@
+[package]
+name = "orangenote-ffi"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "C-ABI FFI layer for OrangeNote core library"
+
+[lib]
+name = "orangenote_ffi"
+crate-type = ["staticlib"]
+
+[dependencies]
+orangenote-core = { path = "../orangenote-core", features = ["whisper"] }
+serde.workspace = true
+serde_json.workspace = true
+log.workspace = true
+libc = "0.2"
