@@ -41,6 +41,11 @@ jobs:
       - name: Install cmake
         run: brew install cmake
 
+      - name: Select Xcode 15.4
+        run: |
+          sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+          xcodebuild -version
+
       - name: Build Rust FFI (arm64)
         run: cargo build --release --target aarch64-apple-darwin -p orangenote-ffi
 
