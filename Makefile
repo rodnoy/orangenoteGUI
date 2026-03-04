@@ -1,5 +1,6 @@
 .PHONY: setup generate build build-debug run clean open init \
-       rust-build rust-build-arm64 rust-build-x86 rust-build-universal
+       rust-build rust-build-arm64 rust-build-x86 rust-build-universal \
+       release dmg
 
 # Install xcodegen if not present
 setup:
@@ -65,3 +66,24 @@ open: generate
 
 # Full setup: install deps, generate project, open
 init: setup generate open
+
+# Build a release DMG (universal binary)
+release:
+	@./scripts/create-release.sh $(VERSION)
+
+# Create DMG from an already-built app (expects build/DerivedData to exist)
+dmg:
+	$(eval VERSION ?= dev)
+	$(eval APP_PATH := build/DerivedData/Build/Products/Release/OrangeNote.app)
+	$(eval DMG_NAME := OrangeNote-$(VERSION)-universal.dmg)
+	@test -d "$(APP_PATH)" || (echo "ERROR: App not found. Run 'make build' first." && exit 1)
+	@rm -rf build/dmg_contents
+	@mkdir -p build/dmg_contents
+	@cp -R "$(APP_PATH)" build/dmg_contents/
+	@ln -s /Applications build/dmg_contents/Applications
+	@hdiutil create -volname "OrangeNote" \
+		-srcfolder build/dmg_contents \
+		-ov -format UDZO \
+		"$(DMG_NAME)"
+	@rm -rf build/dmg_contents
+	@echo "Created: $(DMG_NAME)"

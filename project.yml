@@ -67,6 +67,13 @@ targets:
 
           RUST_PROJECT_DIR="${SRCROOT}"
           UNIVERSAL_DIR="${RUST_PROJECT_DIR}/target/universal/release"
+          UNIVERSAL_LIB="${UNIVERSAL_DIR}/liborangenote_ffi.a"
+
+          # Skip build if the universal library already exists (e.g. CI pre-built it)
+          if [ -f "${UNIVERSAL_LIB}" ]; then
+              echo "Rust FFI library already exists at ${UNIVERSAL_LIB}, skipping build"
+              exit 0
+          fi
 
           cd "${RUST_PROJECT_DIR}"
 
@@ -87,9 +94,9 @@ targets:
           lipo -create \
             "target/aarch64-apple-darwin/release/liborangenote_ffi.a" \
             "target/x86_64-apple-darwin/release/liborangenote_ffi.a" \
-            -output "${UNIVERSAL_DIR}/liborangenote_ffi.a"
+            -output "${UNIVERSAL_LIB}"
 
-          echo "Universal library created at ${UNIVERSAL_DIR}/liborangenote_ffi.a"
+          echo "Universal library created at ${UNIVERSAL_LIB}"
         basedOnDependencyAnalysis: false
         outputFiles: []
     info:

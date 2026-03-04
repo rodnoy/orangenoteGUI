@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build Universal macOS App
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Add Rust targets
+        run: |
+          rustup target add aarch64-apple-darwin
+          rustup target add x86_64-apple-darwin
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Install cmake
+        run: brew install cmake
+
+      - name: Build Rust FFI (arm64)
+        run: cargo build --release --target aarch64-apple-darwin -p orangenote-ffi
+
+      - name: Build Rust FFI (x86_64)
+        run: cargo build --release --target x86_64-apple-darwin -p orangenote-ffi
+
+      - name: Create Universal Binary
+        run: |
+          mkdir -p target/universal/release
+          lipo -create \
+            target/aarch64-apple-darwin/release/liborangenote_ffi.a \
+            target/x86_64-apple-darwin/release/liborangenote_ffi.a \
+            -output target/universal/release/liborangenote_ffi.a
+          echo "Universal library created:"
+          lipo -info target/universal/release/liborangenote_ffi.a
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build macOS App
+        run: |
+          xcodebuild -project OrangeNote.xcodeproj \
+            -scheme OrangeNote \
+            -configuration Release \
+            -derivedDataPath build/DerivedData \
+            ARCHS="arm64 x86_64" \
+            ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create DMG
+        run: |
+          APP_PATH="build/DerivedData/Build/Products/Release/OrangeNote.app"
+          DMG_NAME="OrangeNote-${{ steps.version.outputs.VERSION }}-universal.dmg"
+
+          mkdir -p dmg_contents
+          cp -R "${APP_PATH}" dmg_contents/
+
+          ln -s /Applications dmg_contents/Applications
+
+          hdiutil create -volname "OrangeNote" \
+            -srcfolder dmg_contents \
+            -ov -format UDZO \
+            "${DMG_NAME}"
+
+          echo "DMG_PATH=${DMG_NAME}" >> $GITHUB_ENV
+          echo "Created: ${DMG_NAME}"
+          ls -la "${DMG_NAME}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "OrangeNote ${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## OrangeNote ${{ steps.version.outputs.VERSION }}
+
+            Beautiful offline audio transcription for macOS.
+
+            ### Installation
+            1. Download `OrangeNote-${{ steps.version.outputs.VERSION }}-universal.dmg`
+            2. Open the DMG
+            3. Drag OrangeNote to Applications
+            4. Launch OrangeNote
+
+            > **Note:** The app is not notarized. On first launch, right-click the app and select "Open".
+
+            ### System Requirements
+            - macOS 14.0 (Sonoma) or later
+            - Apple Silicon (M1/M2/M3) or Intel Mac
+
+            ### Features
+            - 🎙️ Offline audio transcription using whisper.cpp
+            - 📁 Drag & drop audio files
+            - 🌍 Multiple language support with auto-detection
+            - 📊 Real-time transcription progress
+            - ⏱️ Timestamped segments
+            - 📤 Export to TXT, SRT, VTT, JSON
+            - 🌙 Dark mode support
+          files: |
+            ${{ env.DMG_PATH }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
