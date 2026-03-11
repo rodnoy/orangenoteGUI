@@ -11,11 +11,17 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var settings: AppSettings
 
+    /// Whether the translate toggle should be disabled (English is explicitly selected).
+    private var isTranslateDisabled: Bool {
+        settings.language == "en"
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 modelSection
                 languageSection
+                translationSection
                 chunkingSection
                 aboutSection
             }
@@ -68,6 +74,31 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
 
                 Text("Select \"Auto-detect\" to let Whisper identify the language automatically.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(4)
+        }
+    }
+
+    // MARK: - Translation Section
+
+    private var translationSection: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Translation", systemImage: "character.book.closed")
+                    .font(.headline)
+
+                Toggle("Translate to English", isOn: $settings.translateToEnglish)
+                    .disabled(isTranslateDisabled)
+                    .onChange(of: settings.language) { _, newValue in
+                        if newValue == "en" {
+                            settings.translateToEnglish = false
+                        }
+                    }
+
+                Text("Translates transcription to English. Only works with non-English source audio.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

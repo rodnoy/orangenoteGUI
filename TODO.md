@@ -34,15 +34,10 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 - [ ] 🔴 Add unit tests for `orangenote-core` transcription pipeline — *added: 2026-03-10*
 - [ ] 🟡 Implement drag-and-drop reordering in transcription segments view — *added: 2026-03-10*
-- [ ] 🟡 We should fix export text from speech analysis because when we change the source audio file, it keeps the old JSON file.
 - [ ] 🟢 Improve error messages shown to the user on FFI failures — *added: 2026-03-10*
-- [ ] 🟢 Add notification in mac notification center when job is DONE
+
 
 ## 🔄 In Progress
-- [ ] 🟡 I want to update drag and drop interface because it doesn't work when I drop items there.
-
-- [ ] 🔴 We should add the menu item check for update and link it to the GitHub release version to fetch the newest one.
-
 
 - [ ] 🟡 Add localization support (i18n) for the macOS UI — *added: 2026-03-10*
 
@@ -50,15 +45,34 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 <!-- Newest first -->
 
+### v0.1.2 — *2026-03-11*
+
+- [x] 🟡 Fixed stale export data bug: JSON/SRT copy now always regenerates content from current transcription result instead of using cached data (`ExportViewModel.swift`) — *done: 2026-03-11*
+- [x] 🟢 Added macOS Notification Center notifications after successful transcription completion (`NotificationService.swift`, `TranscriptionViewModel.swift`, `OrangeNoteApp.swift`) — *done: 2026-03-11*
+
+### Previous
+
+- [x] 🟡 I want to update drag and drop interface because it doesn't work when I drop items there.
+- [x] 🔴 We should add the menu item check for update and link it to the GitHub release version to fetch the newest one.
 - [x] 🔴 Define project architecture and document in `docs/ARCHITECTURE.md` — *added: 2026-03-01, done: 2026-03-10*
 - [x] 🟡 Scaffold Swift UI views and view models — *added: 2026-03-01, done: 2026-03-08*
 - [x] 🟢 Create initial `README.md` — *added: 2026-03-01, done: 2026-03-03*
-- [X] 🔴 Set up CI/CD pipeline with GitHub Actions — *added: 2026-03-10*
+- [x] 🔴 Set up CI/CD pipeline with GitHub Actions — *added: 2026-03-10*
+
 ## 💡 Ideas
 
 - Explore real-time microphone transcription as a future feature.
 - Consider a menu-bar-only mode for quick access.
 - Investigate smaller quantized Whisper models for faster cold-start.
-
 - Add app icon
-- We should add the translation function.And we should check if it's possible for free with Wisper.
+- We should add the translation function. And we should check if it's possible for free with Whisper.
+- Meta NLLB-200 или M2M-100
+===
+Рекомендация: CTranslate2 + NLLB-200 Distilled 600M (INT8)
+
+Модель	Размер (INT8)	Языков	Качество	RAM
+NLLB-200 600M ⭐	~600 MB	200	Хорошее	~2 GB
+NLLB-200 1.3B	~1.3 GB	200	Очень хорошее	~4 GB
+M2M-100 418M	~420 MB	100	Среднее	~1.5 GB
+Opus-MT	~50-150 MB/пара	~200 пар	Хорошее	~1 GB
+Почему NLLB-200 600M: одна модель на 200 языков, ~600 MB (сопоставимо с whisper-моделями), CTranslate2 имеет C++ API для интеграции через Rust FFI (аналогично whisper.cpp). Альтернатива — Apple Translation Framework (macOS 15+, ~20 языков, Swift-only, без скачивания модели).

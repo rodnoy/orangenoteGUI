@@ -44,10 +44,8 @@ final class ExportViewModel: ObservableObject {
 
     /// Opens a save panel and writes the exported content to a file.
     func saveToFile(result: TranscriptionResult) {
-        // Ensure content is generated
-        if exportedContent == nil {
-            generateExport(result: result)
-        }
+        // Always regenerate to ensure fresh content for current transcription
+        generateExport(result: result)
 
         guard let content = exportedContent else {
             errorMessage = "No content to export"
@@ -78,9 +76,8 @@ final class ExportViewModel: ObservableObject {
 
     /// Copies the exported content to the clipboard.
     func copyToClipboard(result: TranscriptionResult) {
-        if exportedContent == nil {
-            generateExport(result: result)
-        }
+        // Always regenerate to ensure fresh content for current transcription
+        generateExport(result: result)
 
         guard let content = exportedContent else { return }
         NSPasteboard.general.clearContents()

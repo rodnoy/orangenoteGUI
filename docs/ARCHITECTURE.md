@@ -435,6 +435,7 @@ graph LR
         TS[TranscriberService]
         MS2[ModelService]
         ES[ExportService]
+        NS[NotificationService]
     end
     
     MV --> TVM
@@ -606,6 +607,18 @@ final class TranscriptionViewModel: ObservableObject {
     }
 }
 ```
+
+### NotificationService
+
+`NotificationService` (`OrangeNote/Services/NotificationService.swift`) provides native macOS notifications via `UNUserNotificationCenter`. It is used to notify the user when a transcription job completes successfully, even if the application window is not in focus.
+
+Key responsibilities:
+
+- Request notification authorization on first use
+- Post a local notification with the transcription summary upon completion
+- Integrate with `TranscriptionViewModel` to trigger notifications at the end of the transcription pipeline
+
+The service is initialized at the app level (`OrangeNoteApp.swift`) and injected into the view model layer.
 
 ### Async/Await Integration
 
@@ -1055,7 +1068,8 @@ orangenoteUI/
 │   │   │   └── Services/
 │   │   │       ├── TranscriberService.swift
 │   │   │       ├── ModelService.swift
-│   │   │       └── ExportService.swift
+│   │   │       ├── ExportService.swift
+│   │   │       └── NotificationService.swift
 │   │   │
 │   │   └── Preview Content/
 │   │
