@@ -24,6 +24,9 @@ final class AppSettings: ObservableObject {
     /// Overlap between chunks in seconds (when chunking is enabled).
     @AppStorage("overlapDuration") var overlapDuration: Int = 5
 
+    /// Whether to translate non-English audio to English using Whisper's built-in translate mode.
+    @AppStorage("translateToEnglish") var translateToEnglish: Bool = false
+
     /// Available language options for the language picker.
     static let availableLanguages: [(code: String, name: String)] = [
         ("auto", "Auto-detect"),

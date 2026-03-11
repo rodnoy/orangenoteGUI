@@ -13,6 +13,10 @@ struct OrangeNoteApp: App {
     @StateObject private var settings = AppSettings()
     @StateObject private var updateChecker = UpdateCheckerViewModel()
 
+    init() {
+        NotificationService.requestPermission()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

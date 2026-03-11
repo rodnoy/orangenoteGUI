@@ -126,11 +126,14 @@ final class TranscriptionViewModel: ObservableObject {
 
                 let transcriptionResult: TranscriptionResult
 
+                let shouldTranslate = settings.language != "en" && settings.translateToEnglish
+
                 if settings.useChunking {
                     transcriptionResult = try await engine.transcribeFileChunked(
                         path: fileURL.path,
                         modelPath: modelPathString,
                         language: settings.language,
+                        translate: shouldTranslate,
                         chunkSeconds: settings.chunkDuration,
                         overlapSeconds: settings.overlapDuration,
                         progressCallback: { [weak self] progressValue in
@@ -144,6 +147,7 @@ final class TranscriptionViewModel: ObservableObject {
                         path: fileURL.path,
                         modelPath: modelPathString,
                         language: settings.language,
+                        translate: shouldTranslate,
                         progressCallback: { [weak self] progressValue in
                             Task { @MainActor in
                                 self?.progress = progressValue
@@ -155,6 +159,12 @@ final class TranscriptionViewModel: ObservableObject {
                 result = transcriptionResult
                 progress = 1.0
                 statusMessage = "Transcription complete"
+
+                NotificationService.sendTranscriptionComplete(
+                    fileName: fileURL.lastPathComponent,
+                    segmentCount: transcriptionResult.segmentCount,
+                    duration: transcriptionResult.duration
+                )
             } catch {
                 if !Task.isCancelled {
                     errorMessage = error.localizedDescription

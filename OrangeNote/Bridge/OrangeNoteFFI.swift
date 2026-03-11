@@ -110,12 +110,14 @@ final class OrangeNoteEngine: Sendable {
     ///   - path: Path to the audio file.
     ///   - modelPath: Path to the Whisper model file.
     ///   - language: Language code (e.g. "en", "ru") or "auto" for auto-detection.
+    ///   - translate: Whether to translate the transcription to English.
     ///   - progressCallback: Called with progress fraction (0.0–1.0).
     /// - Returns: The transcription result.
     func transcribeFile(
         path: String,
         modelPath: String,
         language: String,
+        translate: Bool,
         progressCallback: @escaping @Sendable (Float) -> Void
     ) async throws -> TranscriptionResult {
         try await withCheckedThrowingContinuation { continuation in
@@ -124,7 +126,8 @@ final class OrangeNoteEngine: Sendable {
                     let result = try self.performTranscription(
                         audioPath: path,
                         modelPath: modelPath,
-                        language: language
+                        language: language,
+                        translate: translate
                     )
                     continuation.resume(returning: result)
                 } catch {
@@ -140,6 +143,7 @@ final class OrangeNoteEngine: Sendable {
     ///   - path: Path to the audio file.
     ///   - modelPath: Path to the Whisper model file.
     ///   - language: Language code or "auto" for auto-detection.
+    ///   - translate: Whether to translate the transcription to English.
     ///   - chunkSeconds: Duration of each chunk in seconds.
     ///   - overlapSeconds: Overlap between chunks in seconds.
     ///   - progressCallback: Called with progress fraction (0.0–1.0).
@@ -148,6 +152,7 @@ final class OrangeNoteEngine: Sendable {
         path: String,
         modelPath: String,
         language: String,
+        translate: Bool,
         chunkSeconds: Int,
         overlapSeconds: Int,
         progressCallback: @escaping @Sendable (Float) -> Void
@@ -159,6 +164,7 @@ final class OrangeNoteEngine: Sendable {
                         audioPath: path,
                         modelPath: modelPath,
                         language: language,
+                        translate: translate,
                         chunkSeconds: chunkSeconds,
                         overlapSeconds: overlapSeconds,
                         progressCallback: progressCallback
@@ -241,7 +247,8 @@ final class OrangeNoteEngine: Sendable {
     private func performTranscription(
         audioPath: String,
         modelPath: String,
-        language: String
+        language: String,
+        translate: Bool
     ) throws -> TranscriptionResult {
         // Create transcriber
         var errorPtr: UnsafeMutablePointer<CChar>?
@@ -258,7 +265,7 @@ final class OrangeNoteEngine: Sendable {
         let languageArg: UnsafePointer<CChar>? = language == "auto" ? nil : (language as NSString).utf8String
         var transcribeError: UnsafeMutablePointer<CChar>?
         let resultPtr = audioPath.withCString { cAudio in
-            orangenote_transcribe_file(transcriber, cAudio, languageArg, false, &transcribeError)
+            orangenote_transcribe_file(transcriber, cAudio, languageArg, translate, &transcribeError)
         }
         guard let resultPtr else {
             let message = Self.consumeErrorString(transcribeError)
@@ -274,6 +281,7 @@ final class OrangeNoteEngine: Sendable {
         audioPath: String,
         modelPath: String,
         language: String,
+        translate: Bool,
         chunkSeconds: Int,
         overlapSeconds: Int,
         progressCallback: @escaping @Sendable (Float) -> Void
@@ -302,7 +310,7 @@ final class OrangeNoteEngine: Sendable {
                 transcriber,
                 cAudio,
                 languageArg,
-                false,
+                translate,
                 Int32(chunkSeconds),
                 Int32(overlapSeconds),
                 { currentChunk, totalChunks, userData in
