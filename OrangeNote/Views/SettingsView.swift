@@ -149,7 +149,7 @@ struct SettingsView: View {
                         Text("OrangeNote")
                             .font(.subheadline.weight(.medium))
                         Spacer()
-                        Text("v1.0.0")
+                        Text("v\(UpdateCheckerService.currentAppVersion)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

@@ -58,7 +58,7 @@ struct FileDropZone: View {
                         .fill(isTargeted ? Color.orange.opacity(0.05) : Color.clear)
                 }
         }
-        .onDrop(of: [.audio, .fileURL], isTargeted: $isTargeted) { providers in
+        .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
             handleDrop(providers: providers)
         }
         .animation(.easeInOut(duration: 0.2), value: isTargeted)
