@@ -25,22 +25,22 @@ struct FileDropZone: View {
                 .foregroundStyle(.orange)
                 .symbolEffect(.pulse, isActive: isTargeted)
 
-            Text("Drop Audio File Here")
+            Text("dropzone.title")
                 .font(.headline)
                 .foregroundStyle(.primary)
 
-            Text("or")
+            Text("dropzone.or")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
             Button(action: onChooseFile) {
-                Label("Choose File", systemImage: "folder.badge.plus")
+                Label("dropzone.chooseFile", systemImage: "folder.badge.plus")
                     .font(.body.weight(.medium))
             }
             .buttonStyle(.borderedProminent)
             .tint(.orange)
 
-            Text("Supports MP3, WAV, M4A, FLAC, OGG, and more")
+            Text("dropzone.formats")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }

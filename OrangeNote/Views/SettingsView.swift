@@ -23,13 +23,14 @@ struct SettingsView: View {
                 languageSection
                 translationSection
                 chunkingSection
+                appLanguageSection
                 aboutSection
             }
             .padding(24)
             .frame(maxWidth: 500)
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Settings")
+        .navigationTitle("settings.title")
     }
 
     // MARK: - Model Section
@@ -37,19 +38,19 @@ struct SettingsView: View {
     private var modelSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Whisper Model", systemImage: "cpu")
+                Label("settings.model.title", systemImage: "cpu")
                     .font(.headline)
 
-                Picker("Model", selection: $settings.selectedModel) {
-                    Text("Tiny").tag("tiny")
-                    Text("Base").tag("base")
-                    Text("Small").tag("small")
-                    Text("Medium").tag("medium")
-                    Text("Large").tag("large")
+                Picker("settings.model.label", selection: $settings.selectedModel) {
+                    Text("model.tiny").tag("tiny")
+                    Text("model.base").tag("base")
+                    Text("model.small").tag("small")
+                    Text("model.medium").tag("medium")
+                    Text("model.large").tag("large")
                 }
                 .pickerStyle(.menu)
 
-                Text("Larger models are more accurate but slower and require more memory.")
+                Text("settings.model.description")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -63,17 +64,17 @@ struct SettingsView: View {
     private var languageSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Language", systemImage: "globe")
+                Label("settings.language.title", systemImage: "globe")
                     .font(.headline)
 
-                Picker("Language", selection: $settings.language) {
+                Picker("settings.language.label", selection: $settings.language) {
                     ForEach(AppSettings.availableLanguages, id: \.code) { lang in
-                        Text(lang.name).tag(lang.code)
+                        Text(String(localized: String.LocalizationValue("lang.\(lang.code)"))).tag(lang.code)
                     }
                 }
                 .pickerStyle(.menu)
 
-                Text("Select \"Auto-detect\" to let Whisper identify the language automatically.")
+                Text("settings.language.description")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -87,10 +88,10 @@ struct SettingsView: View {
     private var translationSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Translation", systemImage: "character.book.closed")
+                Label("settings.translation.title", systemImage: "character.book.closed")
                     .font(.headline)
 
-                Toggle("Translate to English", isOn: $settings.translateToEnglish)
+                Toggle("settings.translation.toEnglish", isOn: $settings.translateToEnglish)
                     .disabled(isTranslateDisabled)
                     .onChange(of: settings.language) { _, newValue in
                         if newValue == "en" {
@@ -98,7 +99,7 @@ struct SettingsView: View {
                         }
                     }
 
-                Text("Translates transcription to English. Only works with non-English source audio.")
+                Text("settings.translation.description")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -112,15 +113,15 @@ struct SettingsView: View {
     private var chunkingSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Chunked Processing", systemImage: "rectangle.split.3x1")
+                Label("settings.chunking.title", systemImage: "rectangle.split.3x1")
                     .font(.headline)
 
-                Toggle("Enable chunked transcription", isOn: $settings.useChunking)
+                Toggle("settings.chunking.enable", isOn: $settings.useChunking)
 
                 if settings.useChunking {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Text("Chunk duration:")
+                            Text("settings.chunking.duration")
                                 .font(.subheadline)
                             Spacer()
                             Text("\(settings.chunkDuration)s")
@@ -138,7 +139,7 @@ struct SettingsView: View {
                         .tint(.orange)
 
                         HStack {
-                            Text("Overlap duration:")
+                            Text("settings.chunking.overlap")
                                 .font(.subheadline)
                             Spacer()
                             Text("\(settings.overlapDuration)s")
@@ -158,7 +159,7 @@ struct SettingsView: View {
                     .padding(.leading, 4)
                 }
 
-                Text("Chunking splits long audio files into smaller pieces for processing. Use this for files longer than a few minutes.")
+                Text("settings.chunking.description")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -169,10 +170,28 @@ struct SettingsView: View {
 
     // MARK: - About Section
 
+    private var appLanguageSection: some View {
+        GroupBox {
+            VStack(alignment: .leading, spacing: 12) {
+                Label("settings.appLanguage.title", systemImage: "globe")
+                    .font(.headline)
+
+                Picker("settings.appLanguage.title", selection: $settings.appLanguage) {
+                    ForEach(L10n.supportedLanguages, id: \.code) { lang in
+                        Text(lang.name).tag(lang.code)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(4)
+        }
+    }
+
     private var aboutSection: some View {
         GroupBox {
             VStack(alignment: .leading, spacing: 8) {
-                Label("About", systemImage: "info.circle")
+                Label("settings.about.title", systemImage: "info.circle")
                     .font(.headline)
 
                 VStack(alignment: .leading, spacing: 4) {
@@ -185,11 +204,11 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Text("Local audio transcription powered by Whisper")
+                    Text("settings.about.description")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
-                    Text("All processing happens on your device. No data is sent to external servers.")
+                    Text("settings.about.privacy")
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                 }

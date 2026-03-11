@@ -40,10 +40,18 @@ enum NotificationService {
         duration: TimeInterval
     ) {
         let content = UNMutableNotificationContent()
-        content.title = "Transcription Complete"
-        content.body = "File '\(fileName)' transcribed successfully. "
-            + "\(segmentCount) segment\(segmentCount == 1 ? "" : "s") found "
-            + "(\(formattedDuration(duration)))."
+        content.title = String(localized: "notification.transcriptionComplete.title")
+        let pluralSuffix = segmentCount == 1
+            ? ""
+            : String(localized: "notification.transcriptionComplete.pluralSuffix")
+        let bodyFormat = String(localized: "notification.transcriptionComplete.body")
+        content.body = String(
+            format: bodyFormat,
+            fileName,
+            segmentCount,
+            pluralSuffix,
+            formattedDuration(duration)
+        )
         content.sound = .default
 
         let request = UNNotificationRequest(

@@ -27,6 +27,9 @@ final class AppSettings: ObservableObject {
     /// Whether to translate non-English audio to English using Whisper's built-in translate mode.
     @AppStorage("translateToEnglish") var translateToEnglish: Bool = false
 
+    /// User-selected app language override ("system" follows system locale).
+    @AppStorage("appLanguage") var appLanguage: String = "system"
+
     /// Available language options for the language picker.
     static let availableLanguages: [(code: String, name: String)] = [
         ("auto", "Auto-detect"),

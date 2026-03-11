@@ -8,7 +8,7 @@
 import Foundation
 
 /// The complete result of a transcription operation.
-struct TranscriptionResult: Codable, Sendable {
+struct TranscriptionResult: Codable, Sendable, Equatable {
     let segments: [TranscriptionSegment]
     let fullText: String
     let language: String

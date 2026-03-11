@@ -16,12 +16,12 @@ enum NavigationItem: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var title: LocalizedStringResource {
         switch self {
-        case .transcribe: return "Transcribe"
-        case .results:    return "Results"
-        case .models:     return "Models"
-        case .settings:   return "Settings"
+        case .transcribe: return "nav.transcribe"
+        case .results:    return "nav.results"
+        case .models:     return "nav.models"
+        case .settings:   return "nav.settings"
         }
     }
 
@@ -38,6 +38,7 @@ enum NavigationItem: String, CaseIterable, Identifiable {
 /// The main content view with sidebar navigation.
 struct ContentView: View {
     @EnvironmentObject private var settings: AppSettings
+    @EnvironmentObject private var appState: AppState
 
     @StateObject private var transcriptionVM = TranscriptionViewModel()
     @StateObject private var modelManagerVM = ModelManagerViewModel()
@@ -53,13 +54,26 @@ struct ContentView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 800, minHeight: 550)
+        .onChange(of: transcriptionVM.result) {
+            appState.currentTranscriptionResult = transcriptionVM.result
+        }
+        .onChange(of: appState.triggerSave) {
+            guard appState.triggerSave, let result = appState.currentTranscriptionResult else { return }
+            appState.triggerSave = false
+            exportVM.saveToFile(result: result)
+        }
+        .onChange(of: appState.triggerExport) {
+            guard appState.triggerExport else { return }
+            appState.triggerExport = false
+            selectedItem = .results
+        }
     }
 
     // MARK: - Sidebar
 
     private var sidebar: some View {
         List(NavigationItem.allCases, selection: $selectedItem) { item in
-            Label(item.title, systemImage: item.icon)
+            Label(String(localized: item.title), systemImage: item.icon)
                 .tag(item)
         }
         .listStyle(.sidebar)
@@ -105,7 +119,7 @@ struct ContentView: View {
                 .environmentObject(settings)
 
         case nil:
-            Text("Select an item from the sidebar")
+            Text("nav.selectSidebar")
                 .font(.title2)
                 .foregroundStyle(.secondary)
         }
@@ -117,4 +131,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(AppSettings())
+        .environmentObject(AppState())
 }

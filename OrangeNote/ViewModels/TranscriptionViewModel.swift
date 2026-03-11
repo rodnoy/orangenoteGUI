@@ -29,7 +29,7 @@ final class TranscriptionViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     /// Current status message.
-    @Published var statusMessage: String = "Ready"
+    @Published var statusMessage: String = String(localized: "status.ready")
 
     // MARK: - Private
 
@@ -63,7 +63,7 @@ final class TranscriptionViewModel: ObservableObject {
     /// Opens a file picker for audio files.
     func selectFile() {
         let panel = NSOpenPanel()
-        panel.title = "Select Audio File"
+        panel.title = String(localized: "transcription.selectFile")
         panel.allowedContentTypes = [
             UTType.audio,
             UTType.mpeg4Audio,
@@ -80,7 +80,7 @@ final class TranscriptionViewModel: ObservableObject {
             selectedFileURL = panel.url
             result = nil
             errorMessage = nil
-            statusMessage = "File selected"
+            statusMessage = String(localized: "status.fileSelected")
         }
     }
 
@@ -88,7 +88,7 @@ final class TranscriptionViewModel: ObservableObject {
     func handleDroppedFile(_ url: URL) {
         // Validate that the file exists and is accessible
         guard FileManager.default.fileExists(atPath: url.path) else {
-            errorMessage = "File not found or not accessible"
+            errorMessage = String(localized: "error.fileNotFound")
             return
         }
 
@@ -96,33 +96,33 @@ final class TranscriptionViewModel: ObservableObject {
         let validExtensions = ["mp3", "wav", "m4a", "flac", "ogg", "aac", "opus"]
         let fileExtension = url.pathExtension.lowercased()
         if !validExtensions.contains(fileExtension) {
-            errorMessage = "Unsupported file format: .\(fileExtension)"
+            errorMessage = String(format: String(localized: "error.unsupportedFormat"), fileExtension)
             return
         }
 
         selectedFileURL = url
         result = nil
         errorMessage = nil
-        statusMessage = "File selected"
+        statusMessage = String(localized: "status.fileSelected")
     }
 
     /// Starts the transcription process.
     func startTranscription(settings: AppSettings) {
         guard let fileURL = selectedFileURL else {
-            errorMessage = "No file selected"
+            errorMessage = String(localized: "error.noFile")
             return
         }
 
         errorMessage = nil
         isTranscribing = true
         progress = 0.0
-        statusMessage = "Preparing transcription…"
+        statusMessage = String(localized: "status.preparing")
 
         transcriptionTask = Task {
             do {
                 // Resolve model path
                 let modelPathString = try engine.modelPath(name: settings.selectedModel)
-                statusMessage = "Transcribing…"
+                statusMessage = String(localized: "status.transcribing")
 
                 let transcriptionResult: TranscriptionResult
 
@@ -158,7 +158,7 @@ final class TranscriptionViewModel: ObservableObject {
 
                 result = transcriptionResult
                 progress = 1.0
-                statusMessage = "Transcription complete"
+                statusMessage = String(localized: "status.complete")
 
                 NotificationService.sendTranscriptionComplete(
                     fileName: fileURL.lastPathComponent,
@@ -168,7 +168,7 @@ final class TranscriptionViewModel: ObservableObject {
             } catch {
                 if !Task.isCancelled {
                     errorMessage = error.localizedDescription
-                    statusMessage = "Transcription failed"
+                    statusMessage = String(localized: "status.failed")
                 }
             }
 
@@ -182,7 +182,7 @@ final class TranscriptionViewModel: ObservableObject {
         transcriptionTask = nil
         isTranscribing = false
         progress = 0.0
-        statusMessage = "Cancelled"
+        statusMessage = String(localized: "status.cancelled")
     }
 
     /// Clears the current result and resets state.
@@ -190,6 +190,6 @@ final class TranscriptionViewModel: ObservableObject {
         result = nil
         progress = 0.0
         errorMessage = nil
-        statusMessage = "Ready"
+        statusMessage = String(localized: "status.ready")
     }
 }

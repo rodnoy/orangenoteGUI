@@ -21,13 +21,13 @@ struct ModelManagerView: View {
                 modelList
             }
         }
-        .navigationTitle("Models")
+        .navigationTitle("models.title")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     Task { await viewModel.loadModels() }
                 } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label("models.refresh", systemImage: "arrow.clockwise")
                 }
             }
 
@@ -36,7 +36,7 @@ struct ModelManagerView: View {
                     Button {
                         viewModel.openCacheDirectory()
                     } label: {
-                        Label("Open Cache Folder", systemImage: "folder")
+                        Label("models.openCache", systemImage: "folder")
                     }
                 }
             }
@@ -46,11 +46,11 @@ struct ModelManagerView: View {
                 await viewModel.loadModels()
             }
         }
-        .alert("Error", isPresented: .init(
+        .alert("models.error", isPresented: .init(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
-            Button("OK") { viewModel.errorMessage = nil }
+            Button("models.ok") { viewModel.errorMessage = nil }
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
@@ -62,7 +62,7 @@ struct ModelManagerView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .controlSize(.large)
-            Text("Loading models…")
+            Text("models.loading")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -77,11 +77,11 @@ struct ModelManagerView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("No Models Available")
+            Text("models.empty.title")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Button("Retry") {
+            Button("models.retry") {
                 Task { await viewModel.loadModels() }
             }
             .buttonStyle(.borderedProminent)
@@ -124,7 +124,7 @@ struct ModelManagerView: View {
                         .foregroundStyle(.secondary)
 
                     if model.isCached {
-                        Text("Cached")
+                        Text("models.cached")
                             .font(.caption2.weight(.medium))
                             .foregroundStyle(.green)
                             .padding(.horizontal, 6)
@@ -145,7 +145,7 @@ struct ModelManagerView: View {
                     .foregroundStyle(.green)
                     .font(.body.weight(.medium))
             } else {
-                Text("Not downloaded")
+                Text("models.notDownloaded")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }

@@ -39,11 +39,18 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 ## 🔄 In Progress
 
-- [ ] 🟡 Add localization support (i18n) for the macOS UI — *added: 2026-03-10*
 
 ## ✅ Done
 
 <!-- Newest first -->
+
+### v0.1.3 — *2026-03-11*
+
+- [x] 🟡 Added full app localization (English, French, Russian) with system language detection and manual override in Settings — *done: 2026-03-11*
+- [x] 🟡 Added "Save Transcription" (⌘S) and "Export Transcription" (⌘⇧E) menu items in File menu — *done: 2026-03-11*
+- [x] 🟡 Added Apple Translation integration (macOS 15+) for translating transcription results to 20+ languages — *done: 2026-03-11*
+- [x] 🟢 Added "Translate to English" toggle using Whisper's built-in translate mode — *done: 2026-03-11*
+- [x] 🟢 Added AppState for shared state management between menu commands and views — *done: 2026-03-11*
 
 ### v0.1.2 — *2026-03-11*
 

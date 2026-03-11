@@ -2,18 +2,36 @@
 //  ResultsView.swift
 //  OrangeNote
 //
-//  Displays transcription results with segments, search, and copy functionality.
+//  Displays transcription results with segments, search, copy, and translation functionality.
 //
 
 import SwiftUI
 
-/// Displays the transcription result with segment list, search, and export options.
+#if canImport(Translation)
+import Translation
+#endif
+
+/// Displays the transcription result with segment list, search, export, and translation options.
 struct ResultsView: View {
     let result: TranscriptionResult?
     @ObservedObject var exportVM: ExportViewModel
 
     @State private var searchText = ""
     @State private var showFullText = false
+
+    // Translation view model — only used on macOS 15+
+    private let translationVM: AnyObject?
+
+    init(result: TranscriptionResult?, exportVM: ExportViewModel) {
+        self.result = result
+        self.exportVM = exportVM
+
+        if #available(macOS 15.0, *) {
+            self.translationVM = TranslationViewModel()
+        } else {
+            self.translationVM = nil
+        }
+    }
 
     var body: some View {
         Group {
@@ -23,7 +41,7 @@ struct ResultsView: View {
                 emptyState
             }
         }
-        .navigationTitle("Results")
+        .navigationTitle("results.title")
     }
 
     // MARK: - Empty State
@@ -34,11 +52,11 @@ struct ResultsView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("No Results Yet")
+            Text("results.empty.title")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Text("Transcribe an audio file to see results here")
+            Text("results.empty.subtitle")
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
         }
@@ -53,12 +71,32 @@ struct ResultsView: View {
             toolbar(result)
             Divider()
 
+            // Translation toolbar (macOS 15+ only)
+            if #available(macOS 15.0, *) {
+                translationToolbar(result)
+            }
+
             if showFullText {
-                fullTextView(result)
+                if #available(macOS 15.0, *),
+                   let vm = translationVM as? TranslationViewModel,
+                   vm.showTranslation,
+                   let translated = vm.translatedResult {
+                    translatedFullTextView(translated)
+                } else {
+                    fullTextView(result)
+                }
             } else {
-                segmentListView(result)
+                if #available(macOS 15.0, *),
+                   let vm = translationVM as? TranslationViewModel,
+                   vm.showTranslation,
+                   let translated = vm.translatedResult {
+                    translatedSegmentListView(translated)
+                } else {
+                    segmentListView(result)
+                }
             }
         }
+        .modifier(TranslationTaskModifier(translationVM: translationVM))
     }
 
     // MARK: - Toolbar
@@ -66,10 +104,10 @@ struct ResultsView: View {
     private func toolbar(_ result: TranscriptionResult) -> some View {
         HStack(spacing: 12) {
             // View mode toggle
-            Picker("View", selection: $showFullText) {
-                Label("Segments", systemImage: "list.bullet")
+            Picker("results.view", selection: $showFullText) {
+                Label("results.view.segments", systemImage: "list.bullet")
                     .tag(false)
-                Label("Full Text", systemImage: "doc.plaintext")
+                Label("results.view.fullText", systemImage: "doc.plaintext")
                     .tag(true)
             }
             .pickerStyle(.segmented)
@@ -80,7 +118,7 @@ struct ResultsView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
-                    TextField("Search segments…", text: $searchText)
+                    TextField("results.search", text: $searchText)
                         .textFieldStyle(.plain)
                     if !searchText.isEmpty {
                         Button {
@@ -104,7 +142,7 @@ struct ResultsView: View {
 
             // Stats
             HStack(spacing: 12) {
-                Label("\(result.segmentCount) segments", systemImage: "text.alignleft")
+                Label(String(format: String(localized: "results.segmentsCount"), result.segmentCount), systemImage: "text.alignleft")
                 Label(result.formattedDuration, systemImage: "clock")
             }
             .font(.caption)
@@ -112,25 +150,35 @@ struct ResultsView: View {
 
             // Copy button
             Menu {
-                Button("Copy All Text") {
+                Button("results.copyAll") {
                     copyToClipboard(result.fullText)
                 }
-                Button("Copy as JSON") {
+                Button("results.copyAsJson") {
                     exportVM.selectedFormat = .json
                     exportVM.copyToClipboard(result: result)
                 }
-                Button("Copy as SRT") {
+                Button("results.copyAsSrt") {
                     exportVM.selectedFormat = .srt
                     exportVM.copyToClipboard(result: result)
                 }
             } label: {
-                Label("Copy", systemImage: "doc.on.doc")
+                Label("results.copy", systemImage: "doc.on.doc")
             }
             .menuStyle(.borderlessButton)
             .frame(width: 80)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
+    }
+
+    // MARK: - Translation Toolbar (macOS 15+)
+
+    @available(macOS 15.0, *)
+    private func translationToolbar(_ result: TranscriptionResult) -> some View {
+        TranslationToolbarContent(
+            result: result,
+            translationVM: translationVM as! TranslationViewModel
+        )
     }
 
     // MARK: - Segment List
@@ -142,6 +190,27 @@ struct ResultsView: View {
             LazyVStack(spacing: 0) {
                 ForEach(filteredSegments) { segment in
                     SegmentRow(
+                        segment: segment,
+                        isHighlighted: !searchText.isEmpty
+                    )
+                    Divider()
+                        .padding(.leading, 16)
+                }
+            }
+            .padding(.vertical, 8)
+        }
+    }
+
+    // MARK: - Translated Segment List
+
+    @available(macOS 15.0, *)
+    private func translatedSegmentListView(_ translated: TranslatedResult) -> some View {
+        let filteredSegments = filteredTranslatedSegments(translated.translatedSegments)
+
+        return ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(filteredSegments) { segment in
+                    TranslatedSegmentRow(
                         segment: segment,
                         isHighlighted: !searchText.isEmpty
                     )
@@ -167,6 +236,35 @@ struct ResultsView: View {
         }
     }
 
+    // MARK: - Translated Full Text
+
+    @available(macOS 15.0, *)
+    private func translatedFullTextView(_ translated: TranslatedResult) -> some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                // Original text (dimmed)
+                Text(translated.original.fullText)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
+
+                Divider()
+                    .padding(.horizontal, 16)
+
+                // Translated text
+                Text(translated.translatedFullText)
+                    .font(.body)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+            }
+        }
+    }
+
     // MARK: - Helpers
 
     private func filteredSegments(_ segments: [TranscriptionSegment]) -> [TranscriptionSegment] {
@@ -176,9 +274,132 @@ struct ResultsView: View {
         }
     }
 
+    @available(macOS 15.0, *)
+    private func filteredTranslatedSegments(_ segments: [TranslatedSegment]) -> [TranslatedSegment] {
+        guard !searchText.isEmpty else { return segments }
+        return segments.filter { segment in
+            segment.original.text.localizedCaseInsensitiveContains(searchText)
+            || segment.translatedText.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
     private func copyToClipboard(_ text: String) {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(text, forType: .string)
+    }
+}
+
+// MARK: - Translation Toolbar Content (macOS 15+)
+
+@available(macOS 15.0, *)
+private struct TranslationToolbarContent: View {
+    let result: TranscriptionResult
+    @ObservedObject var translationVM: TranslationViewModel
+
+    var body: some View {
+        let canTranslate = TranslationService.isLanguageSupported(result.language)
+
+        if canTranslate {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    Label("translation.title", systemImage: "character.book.closed")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.secondary)
+
+                    // Target language picker
+                    Picker("translation.targetLanguage", selection: $translationVM.selectedTargetLanguage) {
+                        ForEach(translationVM.availableLanguages) { lang in
+                            Text(String(localized: LocalizedStringResource(stringLiteral: lang.localizationKey)))
+                                .tag(lang.code)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .frame(maxWidth: 160)
+
+                    // Translate button
+                    if translationVM.isTranslating {
+                        ProgressView()
+                            .controlSize(.small)
+                        Text("translation.translating")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Button {
+                            translationVM.translate(result: result)
+                        } label: {
+                            Label("translation.translate", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+
+                    Spacer()
+
+                    // Show original / translation toggle
+                    if translationVM.translatedResult != nil {
+                        Toggle(isOn: $translationVM.showTranslation) {
+                            Text(translationVM.showTranslation
+                                 ? "translation.showOriginal"
+                                 : "translation.showTranslation")
+                                .font(.caption)
+                        }
+                        .toggleStyle(.switch)
+                        .controlSize(.small)
+
+                        Button("translation.clear") {
+                            translationVM.clearTranslation()
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+
+                // Error message
+                if let error = translationVM.errorMessage {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.yellow)
+                        Text(String(format: String(localized: "translation.error"), error))
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
+                }
+
+                Divider()
+            }
+            .onAppear {
+                translationVM.loadAvailableLanguages(sourceLanguage: result.language)
+            }
+            .onChange(of: result.language) {
+                translationVM.loadAvailableLanguages(sourceLanguage: result.language)
+                translationVM.clearTranslation()
+            }
+        }
+    }
+}
+
+// MARK: - Translation Task Modifier
+
+/// A view modifier that conditionally applies `.translationTask()` on macOS 15+.
+private struct TranslationTaskModifier: ViewModifier {
+    let translationVM: AnyObject?
+
+    func body(content: Content) -> some View {
+        if #available(macOS 15.0, *),
+           let vm = translationVM as? TranslationViewModel {
+            content
+                .translationTask(vm.translationConfiguration) { session in
+                    await vm.performTranslation(using: session)
+                }
+        } else {
+            content
+        }
     }
 }
 

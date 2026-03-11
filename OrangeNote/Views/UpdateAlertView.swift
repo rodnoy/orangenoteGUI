@@ -52,25 +52,25 @@ struct UpdateAlertView: View {
     private var contentView: some View {
         switch viewModel.status {
         case .checking:
-            Text("Checking for updates...")
+            Text("update.checking")
                 .font(.headline)
 
         case .upToDate(let version):
             VStack(spacing: 8) {
-                Text("You're up to date!")
+                Text("update.upToDate")
                     .font(.headline)
-                Text("OrangeNote \(version) is the latest version.")
+                Text(String(format: String(localized: "update.latestVersion"), version))
                     .foregroundStyle(.secondary)
             }
 
         case .updateAvailable(let current, let latest, _, let releaseNotes, _):
             VStack(spacing: 12) {
-                Text("Update Available")
+                Text("update.available")
                     .font(.headline)
 
                 HStack(spacing: 16) {
                     VStack {
-                        Text("Current")
+                        Text("update.current")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Text(current)
@@ -81,7 +81,7 @@ struct UpdateAlertView: View {
                         .foregroundStyle(.secondary)
 
                     VStack {
-                        Text("Latest")
+                        Text("update.latest")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                         Text(latest)
@@ -99,7 +99,7 @@ struct UpdateAlertView: View {
                         }
                         .frame(maxHeight: 150)
                     } label: {
-                        Label("Release Notes", systemImage: "doc.text")
+                        Label("update.releaseNotes", systemImage: "doc.text")
                             .font(.subheadline.weight(.medium))
                     }
                 }
@@ -107,7 +107,7 @@ struct UpdateAlertView: View {
 
         case .error(let message):
             VStack(spacing: 8) {
-                Text("Update Check Failed")
+                Text("update.failed")
                     .font(.headline)
                 Text(message)
                     .foregroundStyle(.secondary)
@@ -129,12 +129,12 @@ struct UpdateAlertView: View {
 
         case .updateAvailable:
             HStack(spacing: 12) {
-                Button("Later") {
+                Button("update.later") {
                     viewModel.dismiss()
                 }
                 .keyboardShortcut(.cancelAction)
 
-                Button("Download") {
+                Button("update.download") {
                     viewModel.openReleasePage()
                     viewModel.dismiss()
                 }
@@ -144,7 +144,7 @@ struct UpdateAlertView: View {
             }
 
         default:
-            Button("OK") {
+            Button("update.ok") {
                 viewModel.dismiss()
             }
             .keyboardShortcut(.defaultAction)

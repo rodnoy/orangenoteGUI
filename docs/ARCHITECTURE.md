@@ -423,12 +423,14 @@ graph LR
         TVM[TranscriptionViewModel]
         MVM[ModelViewModel]
         SVM[SettingsViewModel]
+        TRVM[TranslationViewModel]
     end
     
     subgraph Model Layer
         TR[TranscriptionResult]
         MS[ModelState]
         AS[AppSettings]
+        APS[AppState]
     end
     
     subgraph Service Layer
@@ -436,6 +438,7 @@ graph LR
         MS2[ModelService]
         ES[ExportService]
         NS[NotificationService]
+        TRS[TranslationService]
     end
     
     MV --> TVM
@@ -619,6 +622,28 @@ Key responsibilities:
 - Integrate with `TranscriptionViewModel` to trigger notifications at the end of the transcription pipeline
 
 The service is initialized at the app level (`OrangeNoteApp.swift`) and injected into the view model layer.
+
+### TranslationService
+
+`TranslationService` (`OrangeNote/Services/TranslationService.swift`) integrates with Apple's Translation framework (available on macOS 15+) to provide on-device translation of transcription results into 20+ languages. It wraps the system `TranslationSession` API behind a simple async interface.
+
+Key responsibilities:
+
+- Check Translation framework availability at runtime
+- Translate individual text segments or full transcription results
+- Manage translation session lifecycle
+
+### TranslationViewModel
+
+`TranslationViewModel` (`OrangeNote/ViewModels/TranslationViewModel.swift`) manages translation state and configuration for the UI layer. It coordinates between `TranslationService` and the views, exposing published properties for target language selection, translation progress, and translated results.
+
+### AppState
+
+`AppState` (`OrangeNote/Models/AppState.swift`) is a shared `@Observable` object that holds application-wide state accessible by both menu commands and views. It enables communication between the SwiftUI menu bar commands (e.g., "Save Transcription" ⌘S, "Export Transcription" ⌘⇧E) and the active views without tight coupling.
+
+### Localization
+
+The application supports three languages: English (`en`), French (`fr`), and Russian (`ru`). Localized strings are stored in `Localizable.strings` files under `OrangeNote/Resources/{lang}.lproj/`. The app detects the system language at launch and allows manual override via the Settings view. A `LocalizationHelper` (`OrangeNote/Helpers/LocalizationHelper.swift`) provides utilities for language switching at runtime.
 
 ### Async/Await Integration
 
@@ -997,7 +1022,9 @@ orangenoteUI/
 ├── Cargo.toml                      # Workspace root
 ├── README.md
 ├── docs/
-│   └── ARCHITECTURE.md             # This document
+│   ├── ARCHITECTURE.md             # This document
+│   ├── DOC_INDEX.md                # Documentation index
+│   └── v0.1.3-design.md            # v0.1.3 feature design notes
 │
 ├── orangenote-core/                # Rust core library
 │   ├── Cargo.toml
@@ -1023,58 +1050,74 @@ orangenoteUI/
 │
 ├── orangenote-ffi/                 # C-ABI FFI layer
 │   ├── Cargo.toml
+│   ├── cbindgen.toml               # C header generation config
+│   ├── include/
+│   │   └── orangenote_ffi.h        # Generated C-ABI header
 │   └── src/
-│       ├── lib.rs                  # FFI exports
-│       ├── transcriber.rs          # Transcriber FFI
-│       ├── model.rs                # Model management FFI
-│       └── error.rs                # Error handling
+│       └── lib.rs                  # FFI exports
 │
-├── OrangeNote/                     # Xcode project
-│   ├── OrangeNote.xcodeproj/
-│   ├── OrangeNote/
-│   │   ├── OrangeNoteApp.swift     # App entry point
-│   │   ├── OrangeNote-Bridging-Header.h
-│   │   ├── Assets.xcassets/
-│   │   ├── Info.plist
-│   │   ├── Entitlements.plist
-│   │   │
-│   │   ├── Sources/
-│   │   │   ├── FFI/
-│   │   │   │   ├── OrangeNoteFFI.swift
-│   │   │   │   └── TranscriberWrapper.swift
-│   │   │   │
-│   │   │   ├── Models/
-│   │   │   │   ├── TranscriptionResult.swift
-│   │   │   │   ├── Segment.swift
-│   │   │   │   ├── ModelSize.swift
-│   │   │   │   └── Language.swift
-│   │   │   │
-│   │   │   ├── ViewModels/
-│   │   │   │   ├── TranscriptionViewModel.swift
-│   │   │   │   ├── ModelViewModel.swift
-│   │   │   │   └── SettingsViewModel.swift
-│   │   │   │
-│   │   │   ├── Views/
-│   │   │   │   ├── MainView.swift
-│   │   │   │   ├── FileSelectionView.swift
-│   │   │   │   ├── SettingsView.swift
-│   │   │   │   ├── ProgressView.swift
-│   │   │   │   ├── ResultsView.swift
-│   │   │   │   └── Components/
-│   │   │   │       ├── DropZone.swift
-│   │   │   │       ├── SegmentRow.swift
-│   │   │   │       └── ModelPicker.swift
-│   │   │   │
-│   │   │   └── Services/
-│   │   │       ├── TranscriberService.swift
-│   │   │       ├── ModelService.swift
-│   │   │       ├── ExportService.swift
-│   │   │       └── NotificationService.swift
-│   │   │
-│   │   └── Preview Content/
+├── OrangeNote/                     # SwiftUI macOS application
+│   ├── OrangeNoteApp.swift         # App entry point
+│   ├── Info.plist
+│   ├── OrangeNote.entitlements
+│   ├── Assets.xcassets/
 │   │
-│   └── OrangeNoteTests/
-│       └── OrangeNoteTests.swift
+│   ├── Bridge/
+│   │   ├── OrangeNote-Bridging-Header.h
+│   │   ├── OrangeNoteFFI.swift     # Swift FFI wrapper
+│   │   └── FFITypes.swift          # FFI type definitions
+│   │
+│   ├── Helpers/
+│   │   └── LocalizationHelper.swift # Runtime language switching
+│   │
+│   ├── Models/
+│   │   ├── AppSettings.swift
+│   │   ├── AppState.swift          # Shared state for menu commands
+│   │   ├── ExportFormat.swift
+│   │   ├── GitHubRelease.swift
+│   │   ├── TranscriptionResult.swift
+│   │   ├── TranscriptionSegment.swift
+│   │   ├── TranslatedResult.swift
+│   │   ├── UpdateStatus.swift
+│   │   └── WhisperModel.swift
+│   │
+│   ├── Resources/
+│   │   ├── en.lproj/
+│   │   │   └── Localizable.strings  # English strings
+│   │   ├── fr.lproj/
+│   │   │   └── Localizable.strings  # French strings
+│   │   └── ru.lproj/
+│   │       └── Localizable.strings  # Russian strings
+│   │
+│   ├── Scripts/
+│   │   └── build_rust.sh
+│   │
+│   ├── Services/
+│   │   ├── NotificationService.swift
+│   │   ├── TranslationService.swift # Apple Translation (macOS 15+)
+│   │   └── UpdateCheckerService.swift
+│   │
+│   ├── ViewModels/
+│   │   ├── ExportViewModel.swift
+│   │   ├── ModelManagerViewModel.swift
+│   │   ├── TranscriptionViewModel.swift
+│   │   ├── TranslationViewModel.swift # Translation state management
+│   │   └── UpdateCheckerViewModel.swift
+│   │
+│   └── Views/
+│       ├── ContentView.swift
+│       ├── ExportView.swift
+│       ├── ModelManagerView.swift
+│       ├── ResultsView.swift
+│       ├── SettingsView.swift
+│       ├── TranscriptionView.swift
+│       ├── UpdateAlertView.swift
+│       └── Components/
+│           ├── AudioFileInfo.swift
+│           ├── FileDropZone.swift
+│           ├── ProgressIndicator.swift
+│           ├── SegmentRow.swift
+│           └── TranslatedSegmentRow.swift
 │
 ├── vendor/
 │   └── whisper.cpp/                # Git submodule (optional)

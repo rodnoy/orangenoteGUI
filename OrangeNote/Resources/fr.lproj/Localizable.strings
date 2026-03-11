@@ -1,0 +1,218 @@
+/*
+  Localizable.strings (French)
+  OrangeNote
+
+  French localization.
+*/
+
+// MARK: - Navigation
+
+"nav.transcribe" = "Transcrire";
+"nav.results" = "Résultats";
+"nav.models" = "Modèles";
+"nav.settings" = "Paramètres";
+"nav.selectSidebar" = "Sélectionnez un élément dans la barre latérale";
+
+// MARK: - Transcription
+
+"transcription.title" = "Transcrire";
+"transcription.header" = "Transcription audio";
+"transcription.subtitle" = "Sélectionnez un fichier audio à transcrire avec Whisper";
+"transcription.start" = "Démarrer la transcription";
+"transcription.cancel" = "Annuler";
+"transcription.complete" = "Transcription terminée";
+"transcription.duration" = "Durée";
+"transcription.segments" = "Segments";
+"transcription.words" = "Mots";
+"transcription.language" = "Langue";
+"transcription.changeFile" = "Changer de fichier";
+"transcription.selectFile" = "Sélectionner un fichier audio";
+"transcription.dismiss" = "Fermer";
+"transcription.chunked" = "Par morceaux";
+"transcription.auto" = "Auto";
+
+// MARK: - File Drop Zone
+
+"dropzone.title" = "Déposez le fichier audio ici";
+"dropzone.or" = "ou";
+"dropzone.chooseFile" = "Choisir un fichier";
+"dropzone.formats" = "Prend en charge MP3, WAV, M4A, FLAC, OGG et plus";
+
+// MARK: - Results
+
+"results.title" = "Résultats";
+"results.empty.title" = "Pas encore de résultats";
+"results.empty.subtitle" = "Transcrivez un fichier audio pour voir les résultats ici";
+"results.view" = "Affichage";
+"results.view.segments" = "Segments";
+"results.view.fullText" = "Texte complet";
+"results.search" = "Rechercher des segments…";
+"results.segmentsCount" = "%d segments";
+"results.copy" = "Copier";
+"results.copyAll" = "Copier tout le texte";
+"results.copyAsJson" = "Copier en JSON";
+"results.copyAsSrt" = "Copier en SRT";
+
+// MARK: - Export
+
+"export.title" = "Exporter";
+"export.empty.title" = "Rien à exporter";
+"export.empty.subtitle" = "Transcrivez d'abord un fichier audio";
+"export.format" = "Format";
+"export.copy" = "Copier";
+"export.saveAs" = "Enregistrer sous…";
+"export.success" = "Fichier enregistré avec succès";
+"export.dismiss" = "Fermer";
+"export.preview" = "L'aperçu apparaîtra ici";
+"export.panelTitle" = "Exporter la transcription";
+
+// MARK: - Export Formats
+
+"format.txt" = "Texte brut";
+"format.srt" = "SubRip (SRT)";
+"format.vtt" = "WebVTT";
+"format.json" = "JSON";
+
+// MARK: - Models
+
+"models.title" = "Modèles";
+"models.loading" = "Chargement des modèles…";
+"models.empty.title" = "Aucun modèle disponible";
+"models.retry" = "Réessayer";
+"models.refresh" = "Actualiser";
+"models.openCache" = "Ouvrir le dossier cache";
+"models.cached" = "En cache";
+"models.notDownloaded" = "Non téléchargé";
+"models.error" = "Erreur";
+"models.ok" = "OK";
+
+// MARK: - Settings
+
+"settings.title" = "Paramètres";
+"settings.model.title" = "Modèle Whisper";
+"settings.model.label" = "Modèle";
+"settings.model.description" = "Les modèles plus grands sont plus précis mais plus lents et nécessitent plus de mémoire.";
+"settings.language.title" = "Langue";
+"settings.language.label" = "Langue";
+"settings.language.description" = "Sélectionnez « Détection automatique » pour laisser Whisper identifier la langue automatiquement.";
+"settings.translation.title" = "Traduction";
+"settings.translation.toEnglish" = "Traduire en anglais";
+"settings.translation.description" = "Traduit la transcription en anglais. Fonctionne uniquement avec un audio source non anglais.";
+"settings.chunking.title" = "Traitement par morceaux";
+"settings.chunking.enable" = "Activer la transcription par morceaux";
+"settings.chunking.duration" = "Durée du morceau :";
+"settings.chunking.overlap" = "Durée de chevauchement :";
+"settings.chunking.description" = "Le découpage divise les longs fichiers audio en morceaux plus petits pour le traitement. Utilisez-le pour les fichiers de plus de quelques minutes.";
+"settings.about.title" = "À propos";
+"settings.about.description" = "Transcription audio locale propulsée par Whisper";
+"settings.about.privacy" = "Tout le traitement se fait sur votre appareil. Aucune donnée n'est envoyée à des serveurs externes.";
+"settings.appLanguage.title" = "Langue de l'application";
+"settings.appLanguage.system" = "Par défaut du système";
+
+// MARK: - Whisper Model Names
+
+"model.tiny" = "Tiny";
+"model.base" = "Base";
+"model.small" = "Small";
+"model.medium" = "Medium";
+"model.large" = "Large";
+
+// MARK: - Audio Languages
+
+"lang.auto" = "Détection automatique";
+"lang.en" = "Anglais";
+"lang.ru" = "Russe";
+"lang.de" = "Allemand";
+"lang.fr" = "Français";
+"lang.es" = "Espagnol";
+"lang.it" = "Italien";
+"lang.pt" = "Portugais";
+"lang.nl" = "Néerlandais";
+"lang.pl" = "Polonais";
+"lang.uk" = "Ukrainien";
+"lang.ja" = "Japonais";
+"lang.zh" = "Chinois";
+"lang.ko" = "Coréen";
+"lang.ar" = "Arabe";
+"lang.hi" = "Hindi";
+"lang.tr" = "Turc";
+"lang.sv" = "Suédois";
+"lang.da" = "Danois";
+"lang.fi" = "Finnois";
+"lang.no" = "Norvégien";
+"lang.cs" = "Tchèque";
+"lang.ro" = "Roumain";
+"lang.hu" = "Hongrois";
+"lang.el" = "Grec";
+"lang.he" = "Hébreu";
+"lang.th" = "Thaï";
+"lang.vi" = "Vietnamien";
+"lang.id" = "Indonésien";
+
+// MARK: - Update
+
+"update.checking" = "Recherche de mises à jour...";
+"update.upToDate" = "Vous êtes à jour !";
+"update.latestVersion" = "OrangeNote %@ est la dernière version.";
+"update.available" = "Mise à jour disponible";
+"update.current" = "Actuelle";
+"update.latest" = "Dernière";
+"update.releaseNotes" = "Notes de version";
+"update.failed" = "Échec de la vérification";
+"update.later" = "Plus tard";
+"update.download" = "Télécharger";
+"update.ok" = "OK";
+
+// MARK: - Progress
+
+"progress.processing" = "Traitement en cours…";
+
+// MARK: - Menu Commands
+
+"menu.checkUpdates" = "Rechercher des mises à jour...";
+"menu.save" = "Enregistrer la transcription";
+"menu.export" = "Exporter la transcription…";
+
+// MARK: - Status Messages
+
+"status.ready" = "Prêt";
+"status.fileSelected" = "Fichier sélectionné";
+"status.preparing" = "Préparation de la transcription…";
+"status.transcribing" = "Transcription en cours…";
+"status.complete" = "Transcription terminée";
+"status.failed" = "Échec de la transcription";
+"status.cancelled" = "Annulé";
+
+// MARK: - Error Messages
+
+"error.noFile" = "Aucun fichier sélectionné";
+"error.fileNotFound" = "Fichier introuvable ou inaccessible";
+"error.unsupportedFormat" = "Format de fichier non pris en charge : .%@";
+"error.noContent" = "Aucun contenu à exporter";
+"error.saveFailed" = "Échec de l'enregistrement : %@";
+
+// MARK: - Notifications
+
+"notification.transcriptionComplete.title" = "Transcription terminée";
+"notification.transcriptionComplete.body" = "Fichier « %1$@ » transcrit avec succès. %2$d segment%3$@ trouvé%3$@ (%4$@).";
+"notification.transcriptionComplete.pluralSuffix" = "s";
+
+// MARK: - Translation
+
+"translation.title" = "Traduction";
+"translation.translate" = "Traduire";
+"translation.translating" = "Traduction en cours…";
+"translation.targetLanguage" = "Langue cible";
+"translation.showOriginal" = "Afficher l'original";
+"translation.showTranslation" = "Afficher la traduction";
+"translation.clear" = "Effacer la traduction";
+"translation.unavailable" = "Traduction non disponible";
+"translation.unsupportedLanguage" = "Langue source non prise en charge pour la traduction";
+"translation.requiresMacOS15" = "Nécessite macOS 15 ou ultérieur";
+"translation.error" = "Échec de la traduction : %@";
+
+// MARK: - Common
+
+"common.cancel" = "Annuler";
+"common.ok" = "OK";
+"common.dismiss" = "Fermer";

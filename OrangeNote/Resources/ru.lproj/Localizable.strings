@@ -1,0 +1,218 @@
+/*
+  Localizable.strings (Russian)
+  OrangeNote
+
+  Russian localization.
+*/
+
+// MARK: - Navigation
+
+"nav.transcribe" = "Транскрибировать";
+"nav.results" = "Результаты";
+"nav.models" = "Модели";
+"nav.settings" = "Настройки";
+"nav.selectSidebar" = "Выберите элемент на боковой панели";
+
+// MARK: - Transcription
+
+"transcription.title" = "Транскрибировать";
+"transcription.header" = "Транскрипция аудио";
+"transcription.subtitle" = "Выберите аудиофайл для транскрипции с помощью Whisper";
+"transcription.start" = "Начать транскрипцию";
+"transcription.cancel" = "Отмена";
+"transcription.complete" = "Транскрипция завершена";
+"transcription.duration" = "Длительность";
+"transcription.segments" = "Сегменты";
+"transcription.words" = "Слова";
+"transcription.language" = "Язык";
+"transcription.changeFile" = "Сменить файл";
+"transcription.selectFile" = "Выбрать аудиофайл";
+"transcription.dismiss" = "Закрыть";
+"transcription.chunked" = "По частям";
+"transcription.auto" = "Авто";
+
+// MARK: - File Drop Zone
+
+"dropzone.title" = "Перетащите аудиофайл сюда";
+"dropzone.or" = "или";
+"dropzone.chooseFile" = "Выбрать файл";
+"dropzone.formats" = "Поддерживает MP3, WAV, M4A, FLAC, OGG и другие";
+
+// MARK: - Results
+
+"results.title" = "Результаты";
+"results.empty.title" = "Пока нет результатов";
+"results.empty.subtitle" = "Транскрибируйте аудиофайл, чтобы увидеть результаты";
+"results.view" = "Вид";
+"results.view.segments" = "Сегменты";
+"results.view.fullText" = "Полный текст";
+"results.search" = "Поиск сегментов…";
+"results.segmentsCount" = "%d сегментов";
+"results.copy" = "Копировать";
+"results.copyAll" = "Копировать весь текст";
+"results.copyAsJson" = "Копировать как JSON";
+"results.copyAsSrt" = "Копировать как SRT";
+
+// MARK: - Export
+
+"export.title" = "Экспорт";
+"export.empty.title" = "Нечего экспортировать";
+"export.empty.subtitle" = "Сначала транскрибируйте аудиофайл";
+"export.format" = "Формат";
+"export.copy" = "Копировать";
+"export.saveAs" = "Сохранить как…";
+"export.success" = "Файл успешно сохранён";
+"export.dismiss" = "Закрыть";
+"export.preview" = "Предпросмотр появится здесь";
+"export.panelTitle" = "Экспорт транскрипции";
+
+// MARK: - Export Formats
+
+"format.txt" = "Простой текст";
+"format.srt" = "SubRip (SRT)";
+"format.vtt" = "WebVTT";
+"format.json" = "JSON";
+
+// MARK: - Models
+
+"models.title" = "Модели";
+"models.loading" = "Загрузка моделей…";
+"models.empty.title" = "Нет доступных моделей";
+"models.retry" = "Повторить";
+"models.refresh" = "Обновить";
+"models.openCache" = "Открыть папку кэша";
+"models.cached" = "В кэше";
+"models.notDownloaded" = "Не загружено";
+"models.error" = "Ошибка";
+"models.ok" = "OK";
+
+// MARK: - Settings
+
+"settings.title" = "Настройки";
+"settings.model.title" = "Модель Whisper";
+"settings.model.label" = "Модель";
+"settings.model.description" = "Большие модели точнее, но медленнее и требуют больше памяти.";
+"settings.language.title" = "Язык";
+"settings.language.label" = "Язык";
+"settings.language.description" = "Выберите «Автоопределение», чтобы Whisper автоматически определил язык.";
+"settings.translation.title" = "Перевод";
+"settings.translation.toEnglish" = "Перевести на английский";
+"settings.translation.description" = "Переводит транскрипцию на английский. Работает только с неанглийским аудио.";
+"settings.chunking.title" = "Обработка по частям";
+"settings.chunking.enable" = "Включить транскрипцию по частям";
+"settings.chunking.duration" = "Длительность части:";
+"settings.chunking.overlap" = "Длительность перекрытия:";
+"settings.chunking.description" = "Разбиение делит длинные аудиофайлы на части для обработки. Используйте для файлов длиннее нескольких минут.";
+"settings.about.title" = "О программе";
+"settings.about.description" = "Локальная транскрипция аудио на базе Whisper";
+"settings.about.privacy" = "Вся обработка происходит на вашем устройстве. Данные не отправляются на внешние серверы.";
+"settings.appLanguage.title" = "Язык приложения";
+"settings.appLanguage.system" = "Системный";
+
+// MARK: - Whisper Model Names
+
+"model.tiny" = "Tiny";
+"model.base" = "Base";
+"model.small" = "Small";
+"model.medium" = "Medium";
+"model.large" = "Large";
+
+// MARK: - Audio Languages
+
+"lang.auto" = "Автоопределение";
+"lang.en" = "Английский";
+"lang.ru" = "Русский";
+"lang.de" = "Немецкий";
+"lang.fr" = "Французский";
+"lang.es" = "Испанский";
+"lang.it" = "Итальянский";
+"lang.pt" = "Португальский";
+"lang.nl" = "Нидерландский";
+"lang.pl" = "Польский";
+"lang.uk" = "Украинский";
+"lang.ja" = "Японский";
+"lang.zh" = "Китайский";
+"lang.ko" = "Корейский";
+"lang.ar" = "Арабский";
+"lang.hi" = "Хинди";
+"lang.tr" = "Турецкий";
+"lang.sv" = "Шведский";
+"lang.da" = "Датский";
+"lang.fi" = "Финский";
+"lang.no" = "Норвежский";
+"lang.cs" = "Чешский";
+"lang.ro" = "Румынский";
+"lang.hu" = "Венгерский";
+"lang.el" = "Греческий";
+"lang.he" = "Иврит";
+"lang.th" = "Тайский";
+"lang.vi" = "Вьетнамский";
+"lang.id" = "Индонезийский";
+
+// MARK: - Update
+
+"update.checking" = "Проверка обновлений...";
+"update.upToDate" = "У вас последняя версия!";
+"update.latestVersion" = "OrangeNote %@ — последняя версия.";
+"update.available" = "Доступно обновление";
+"update.current" = "Текущая";
+"update.latest" = "Последняя";
+"update.releaseNotes" = "Примечания к выпуску";
+"update.failed" = "Ошибка проверки обновлений";
+"update.later" = "Позже";
+"update.download" = "Скачать";
+"update.ok" = "OK";
+
+// MARK: - Progress
+
+"progress.processing" = "Обработка…";
+
+// MARK: - Menu Commands
+
+"menu.checkUpdates" = "Проверить обновления...";
+"menu.save" = "Сохранить транскрипцию";
+"menu.export" = "Экспортировать транскрипцию…";
+
+// MARK: - Status Messages
+
+"status.ready" = "Готово";
+"status.fileSelected" = "Файл выбран";
+"status.preparing" = "Подготовка транскрипции…";
+"status.transcribing" = "Транскрибирование…";
+"status.complete" = "Транскрипция завершена";
+"status.failed" = "Ошибка транскрипции";
+"status.cancelled" = "Отменено";
+
+// MARK: - Error Messages
+
+"error.noFile" = "Файл не выбран";
+"error.fileNotFound" = "Файл не найден или недоступен";
+"error.unsupportedFormat" = "Неподдерживаемый формат файла: .%@";
+"error.noContent" = "Нет содержимого для экспорта";
+"error.saveFailed" = "Не удалось сохранить файл: %@";
+
+// MARK: - Notifications
+
+"notification.transcriptionComplete.title" = "Транскрипция завершена";
+"notification.transcriptionComplete.body" = "Файл «%1$@» успешно транскрибирован. Найдено сегментов: %2$d (%4$@).";
+"notification.transcriptionComplete.pluralSuffix" = "";
+
+// MARK: - Translation
+
+"translation.title" = "Перевод";
+"translation.translate" = "Перевести";
+"translation.translating" = "Перевод…";
+"translation.targetLanguage" = "Язык перевода";
+"translation.showOriginal" = "Показать оригинал";
+"translation.showTranslation" = "Показать перевод";
+"translation.clear" = "Очистить перевод";
+"translation.unavailable" = "Перевод недоступен";
+"translation.unsupportedLanguage" = "Исходный язык не поддерживается для перевода";
+"translation.requiresMacOS15" = "Требуется macOS 15 или новее";
+"translation.error" = "Ошибка перевода: %@";
+
+// MARK: - Common
+
+"common.cancel" = "Отмена";
+"common.ok" = "OK";
+"common.dismiss" = "Закрыть";

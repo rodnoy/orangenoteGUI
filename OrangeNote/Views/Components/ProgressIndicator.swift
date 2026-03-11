@@ -24,7 +24,7 @@ struct ProgressIndicator: View {
                 if isIndeterminate {
                     ProgressView()
                         .controlSize(.small)
-                    Text("Processing…")
+                    Text("progress.processing")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 } else {

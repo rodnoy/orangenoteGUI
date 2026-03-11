@@ -20,7 +20,7 @@ struct ExportView: View {
                 emptyState
             }
         }
-        .navigationTitle("Export")
+        .navigationTitle("export.title")
     }
 
     // MARK: - Empty State
@@ -31,11 +31,11 @@ struct ExportView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("Nothing to Export")
+            Text("export.empty.title")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Text("Transcribe an audio file first")
+            Text("export.empty.subtitle")
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
         }
@@ -48,7 +48,7 @@ struct ExportView: View {
         VStack(spacing: 0) {
             // Format picker and actions
             HStack(spacing: 16) {
-                Picker("Format", selection: $viewModel.selectedFormat) {
+                Picker("export.format", selection: $viewModel.selectedFormat) {
                     ForEach(ExportFormat.allCases) { format in
                         Text(format.displayName).tag(format)
                     }
@@ -61,13 +61,13 @@ struct ExportView: View {
                 Button {
                     viewModel.copyToClipboard(result: result)
                 } label: {
-                    Label("Copy", systemImage: "doc.on.doc")
+                    Label("export.copy", systemImage: "doc.on.doc")
                 }
 
                 Button {
                     viewModel.saveToFile(result: result)
                 } label: {
-                    Label("Save As…", systemImage: "square.and.arrow.down")
+                    Label("export.saveAs", systemImage: "square.and.arrow.down")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.orange)
@@ -81,7 +81,7 @@ struct ExportView: View {
                 HStack {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Text("File saved successfully")
+                    Text("export.success")
                         .font(.callout)
                     Spacer()
                 }
@@ -99,7 +99,7 @@ struct ExportView: View {
                         .font(.callout)
                         .foregroundStyle(.red)
                     Spacer()
-                    Button("Dismiss") {
+                    Button("export.dismiss") {
                         viewModel.errorMessage = nil
                     }
                     .buttonStyle(.plain)
@@ -119,7 +119,7 @@ struct ExportView: View {
                         .padding(16)
                 } else {
                     VStack(spacing: 8) {
-                        Text("Preview will appear here")
+                        Text("export.preview")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }

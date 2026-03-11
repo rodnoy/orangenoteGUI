@@ -1,0 +1,218 @@
+/*
+  Localizable.strings (English)
+  OrangeNote
+
+  English localization — base/default language.
+*/
+
+// MARK: - Navigation
+
+"nav.transcribe" = "Transcribe";
+"nav.results" = "Results";
+"nav.models" = "Models";
+"nav.settings" = "Settings";
+"nav.selectSidebar" = "Select an item from the sidebar";
+
+// MARK: - Transcription
+
+"transcription.title" = "Transcribe";
+"transcription.header" = "Audio Transcription";
+"transcription.subtitle" = "Select an audio file to transcribe using Whisper";
+"transcription.start" = "Start Transcription";
+"transcription.cancel" = "Cancel";
+"transcription.complete" = "Transcription Complete";
+"transcription.duration" = "Duration";
+"transcription.segments" = "Segments";
+"transcription.words" = "Words";
+"transcription.language" = "Language";
+"transcription.changeFile" = "Change File";
+"transcription.selectFile" = "Select Audio File";
+"transcription.dismiss" = "Dismiss";
+"transcription.chunked" = "Chunked";
+"transcription.auto" = "Auto";
+
+// MARK: - File Drop Zone
+
+"dropzone.title" = "Drop Audio File Here";
+"dropzone.or" = "or";
+"dropzone.chooseFile" = "Choose File";
+"dropzone.formats" = "Supports MP3, WAV, M4A, FLAC, OGG, and more";
+
+// MARK: - Results
+
+"results.title" = "Results";
+"results.empty.title" = "No Results Yet";
+"results.empty.subtitle" = "Transcribe an audio file to see results here";
+"results.view" = "View";
+"results.view.segments" = "Segments";
+"results.view.fullText" = "Full Text";
+"results.search" = "Search segments…";
+"results.segmentsCount" = "%d segments";
+"results.copy" = "Copy";
+"results.copyAll" = "Copy All Text";
+"results.copyAsJson" = "Copy as JSON";
+"results.copyAsSrt" = "Copy as SRT";
+
+// MARK: - Export
+
+"export.title" = "Export";
+"export.empty.title" = "Nothing to Export";
+"export.empty.subtitle" = "Transcribe an audio file first";
+"export.format" = "Format";
+"export.copy" = "Copy";
+"export.saveAs" = "Save As…";
+"export.success" = "File saved successfully";
+"export.dismiss" = "Dismiss";
+"export.preview" = "Preview will appear here";
+"export.panelTitle" = "Export Transcription";
+
+// MARK: - Export Formats
+
+"format.txt" = "Plain Text";
+"format.srt" = "SubRip (SRT)";
+"format.vtt" = "WebVTT";
+"format.json" = "JSON";
+
+// MARK: - Models
+
+"models.title" = "Models";
+"models.loading" = "Loading models…";
+"models.empty.title" = "No Models Available";
+"models.retry" = "Retry";
+"models.refresh" = "Refresh";
+"models.openCache" = "Open Cache Folder";
+"models.cached" = "Cached";
+"models.notDownloaded" = "Not downloaded";
+"models.error" = "Error";
+"models.ok" = "OK";
+
+// MARK: - Settings
+
+"settings.title" = "Settings";
+"settings.model.title" = "Whisper Model";
+"settings.model.label" = "Model";
+"settings.model.description" = "Larger models are more accurate but slower and require more memory.";
+"settings.language.title" = "Language";
+"settings.language.label" = "Language";
+"settings.language.description" = "Select \"Auto-detect\" to let Whisper identify the language automatically.";
+"settings.translation.title" = "Translation";
+"settings.translation.toEnglish" = "Translate to English";
+"settings.translation.description" = "Translates transcription to English. Only works with non-English source audio.";
+"settings.chunking.title" = "Chunked Processing";
+"settings.chunking.enable" = "Enable chunked transcription";
+"settings.chunking.duration" = "Chunk duration:";
+"settings.chunking.overlap" = "Overlap duration:";
+"settings.chunking.description" = "Chunking splits long audio files into smaller pieces for processing. Use this for files longer than a few minutes.";
+"settings.about.title" = "About";
+"settings.about.description" = "Local audio transcription powered by Whisper";
+"settings.about.privacy" = "All processing happens on your device. No data is sent to external servers.";
+"settings.appLanguage.title" = "App Language";
+"settings.appLanguage.system" = "System Default";
+
+// MARK: - Whisper Model Names
+
+"model.tiny" = "Tiny";
+"model.base" = "Base";
+"model.small" = "Small";
+"model.medium" = "Medium";
+"model.large" = "Large";
+
+// MARK: - Audio Languages
+
+"lang.auto" = "Auto-detect";
+"lang.en" = "English";
+"lang.ru" = "Russian";
+"lang.de" = "German";
+"lang.fr" = "French";
+"lang.es" = "Spanish";
+"lang.it" = "Italian";
+"lang.pt" = "Portuguese";
+"lang.nl" = "Dutch";
+"lang.pl" = "Polish";
+"lang.uk" = "Ukrainian";
+"lang.ja" = "Japanese";
+"lang.zh" = "Chinese";
+"lang.ko" = "Korean";
+"lang.ar" = "Arabic";
+"lang.hi" = "Hindi";
+"lang.tr" = "Turkish";
+"lang.sv" = "Swedish";
+"lang.da" = "Danish";
+"lang.fi" = "Finnish";
+"lang.no" = "Norwegian";
+"lang.cs" = "Czech";
+"lang.ro" = "Romanian";
+"lang.hu" = "Hungarian";
+"lang.el" = "Greek";
+"lang.he" = "Hebrew";
+"lang.th" = "Thai";
+"lang.vi" = "Vietnamese";
+"lang.id" = "Indonesian";
+
+// MARK: - Update
+
+"update.checking" = "Checking for updates...";
+"update.upToDate" = "You're up to date!";
+"update.latestVersion" = "OrangeNote %@ is the latest version.";
+"update.available" = "Update Available";
+"update.current" = "Current";
+"update.latest" = "Latest";
+"update.releaseNotes" = "Release Notes";
+"update.failed" = "Update Check Failed";
+"update.later" = "Later";
+"update.download" = "Download";
+"update.ok" = "OK";
+
+// MARK: - Progress
+
+"progress.processing" = "Processing…";
+
+// MARK: - Menu Commands
+
+"menu.checkUpdates" = "Check for Updates...";
+"menu.save" = "Save Transcription";
+"menu.export" = "Export Transcription…";
+
+// MARK: - Status Messages
+
+"status.ready" = "Ready";
+"status.fileSelected" = "File selected";
+"status.preparing" = "Preparing transcription…";
+"status.transcribing" = "Transcribing…";
+"status.complete" = "Transcription complete";
+"status.failed" = "Transcription failed";
+"status.cancelled" = "Cancelled";
+
+// MARK: - Error Messages
+
+"error.noFile" = "No file selected";
+"error.fileNotFound" = "File not found or not accessible";
+"error.unsupportedFormat" = "Unsupported file format: .%@";
+"error.noContent" = "No content to export";
+"error.saveFailed" = "Failed to save file: %@";
+
+// MARK: - Notifications
+
+"notification.transcriptionComplete.title" = "Transcription Complete";
+"notification.transcriptionComplete.body" = "File '%1$@' transcribed successfully. %2$d segment%3$@ found (%4$@).";
+"notification.transcriptionComplete.pluralSuffix" = "s";
+
+// MARK: - Translation
+
+"translation.title" = "Translation";
+"translation.translate" = "Translate";
+"translation.translating" = "Translating…";
+"translation.targetLanguage" = "Target Language";
+"translation.showOriginal" = "Show Original";
+"translation.showTranslation" = "Show Translation";
+"translation.clear" = "Clear Translation";
+"translation.unavailable" = "Translation not available";
+"translation.unsupportedLanguage" = "Source language not supported for translation";
+"translation.requiresMacOS15" = "Requires macOS 15 or later";
+"translation.error" = "Translation failed: %@";
+
+// MARK: - Common
+
+"common.cancel" = "Cancel";
+"common.ok" = "OK";
+"common.dismiss" = "Dismiss";

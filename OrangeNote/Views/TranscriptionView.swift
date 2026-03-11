@@ -23,7 +23,7 @@ struct TranscriptionView: View {
             }
             .padding(24)
         }
-        .navigationTitle("Transcribe")
+        .navigationTitle("transcription.title")
     }
 
     // MARK: - Header
@@ -34,10 +34,10 @@ struct TranscriptionView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.orange)
 
-            Text("Audio Transcription")
+            Text("transcription.header")
                 .font(.title2.weight(.semibold))
 
-            Text("Select an audio file to transcribe using Whisper")
+            Text("transcription.subtitle")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -59,7 +59,7 @@ struct TranscriptionView: View {
                 Button {
                     viewModel.selectFile()
                 } label: {
-                    Label("Change File", systemImage: "arrow.triangle.2.circlepath")
+                    Label("transcription.changeFile", systemImage: "arrow.triangle.2.circlepath")
                         .font(.caption)
                 }
                 .buttonStyle(.plain)
@@ -87,7 +87,7 @@ struct TranscriptionView: View {
                 Button(role: .destructive) {
                     viewModel.cancelTranscription()
                 } label: {
-                    Label("Cancel", systemImage: "xmark.circle")
+                    Label("transcription.cancel", systemImage: "xmark.circle")
                         .frame(minWidth: 160)
                 }
                 .buttonStyle(.borderedProminent)
@@ -97,7 +97,7 @@ struct TranscriptionView: View {
                 Button {
                     viewModel.startTranscription(settings: settings)
                 } label: {
-                    Label("Start Transcription", systemImage: "play.fill")
+                    Label("transcription.start", systemImage: "play.fill")
                         .frame(minWidth: 160)
                 }
                 .buttonStyle(.borderedProminent)
@@ -110,11 +110,13 @@ struct TranscriptionView: View {
             HStack(spacing: 16) {
                 Label(settings.selectedModel, systemImage: "cpu")
                 Label(
-                    settings.language == "auto" ? "Auto" : settings.language.uppercased(),
+                    settings.language == "auto"
+                        ? String(localized: "transcription.auto")
+                        : settings.language.uppercased(),
                     systemImage: "globe"
                 )
                 if settings.useChunking {
-                    Label("Chunked", systemImage: "rectangle.split.3x1")
+                    Label("transcription.chunked", systemImage: "rectangle.split.3x1")
                 }
             }
             .font(.caption)
@@ -156,7 +158,7 @@ struct TranscriptionView: View {
                     .font(.callout)
                     .foregroundStyle(.red)
                 Spacer()
-                Button("Dismiss") {
+                Button("transcription.dismiss") {
                     viewModel.errorMessage = nil
                 }
                 .buttonStyle(.plain)
@@ -180,14 +182,14 @@ struct TranscriptionView: View {
                 .font(.system(size: 32))
                 .foregroundStyle(.green)
 
-            Text("Transcription Complete")
+            Text("transcription.complete")
                 .font(.headline)
 
             HStack(spacing: 24) {
-                statItem(title: "Duration", value: result.formattedDuration)
-                statItem(title: "Segments", value: "\(result.segmentCount)")
-                statItem(title: "Words", value: "\(result.wordCount)")
-                statItem(title: "Language", value: result.language.uppercased())
+                statItem(title: String(localized: "transcription.duration"), value: result.formattedDuration)
+                statItem(title: String(localized: "transcription.segments"), value: "\(result.segmentCount)")
+                statItem(title: String(localized: "transcription.words"), value: "\(result.wordCount)")
+                statItem(title: String(localized: "transcription.language"), value: result.language.uppercased())
             }
         }
         .padding(16)
