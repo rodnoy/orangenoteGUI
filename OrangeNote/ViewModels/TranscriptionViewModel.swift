@@ -86,6 +86,20 @@ final class TranscriptionViewModel: ObservableObject {
 
     /// Handles a file dropped onto the drop zone.
     func handleDroppedFile(_ url: URL) {
+        // Validate that the file exists and is accessible
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            errorMessage = "File not found or not accessible"
+            return
+        }
+
+        // Validate file extension
+        let validExtensions = ["mp3", "wav", "m4a", "flac", "ogg", "aac", "opus"]
+        let fileExtension = url.pathExtension.lowercased()
+        if !validExtensions.contains(fileExtension) {
+            errorMessage = "Unsupported file format: .\(fileExtension)"
+            return
+        }
+
         selectedFileURL = url
         result = nil
         errorMessage = nil

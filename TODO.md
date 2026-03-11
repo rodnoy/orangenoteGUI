@@ -34,12 +34,17 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 - [ ] 🔴 Add unit tests for `orangenote-core` transcription pipeline — *added: 2026-03-10*
 - [ ] 🟡 Implement drag-and-drop reordering in transcription segments view — *added: 2026-03-10*
-- [ ] 🟡 Add localization support (i18n) for the macOS UI — *added: 2026-03-10*
+- [ ] 🟡 We should fix export text from speech analysis because when we change the source audio file, it keeps the old JSON file.
 - [ ] 🟢 Improve error messages shown to the user on FFI failures — *added: 2026-03-10*
+- [ ] 🟢 Add notification in mac notification center when job is DONE
 
 ## 🔄 In Progress
+- [ ] 🟡 I want to update drag and drop interface because it doesn't work when I drop items there.
 
-- [ ] 🔴 Set up CI/CD pipeline with GitHub Actions — *added: 2026-03-10*
+- [ ] 🔴 We should add the menu item check for update and link it to the GitHub release version to fetch the newest one.
+
+
+- [ ] 🟡 Add localization support (i18n) for the macOS UI — *added: 2026-03-10*
 
 ## ✅ Done
 
@@ -48,14 +53,12 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 - [x] 🔴 Define project architecture and document in `docs/ARCHITECTURE.md` — *added: 2026-03-01, done: 2026-03-10*
 - [x] 🟡 Scaffold Swift UI views and view models — *added: 2026-03-01, done: 2026-03-08*
 - [x] 🟢 Create initial `README.md` — *added: 2026-03-01, done: 2026-03-03*
-
+- [X] 🔴 Set up CI/CD pipeline with GitHub Actions — *added: 2026-03-10*
 ## 💡 Ideas
 
 - Explore real-time microphone transcription as a future feature.
 - Consider a menu-bar-only mode for quick access.
 - Investigate smaller quantized Whisper models for faster cold-start.
-- I want to update drag and drop interface because it doesn't work when I drop items there.
-- We should fix export text from speech analysis because when we change the source audio file, it keeps the old JSON file.
+
 - Add app icon
 - We should add the translation function.And we should check if it's possible for free with Wisper.
-- We should add the menu item check for update and link it to the GitHub release version to fetch the newest one.

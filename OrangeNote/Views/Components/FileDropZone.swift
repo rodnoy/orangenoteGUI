@@ -69,20 +69,53 @@ struct FileDropZone: View {
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         guard let provider = providers.first else { return false }
 
-        // Try loading as file URL
-        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, _ in
-                guard let data = item as? Data,
-                      let url = URL(dataRepresentation: data, relativeTo: nil) else {
+        // Try loading as URL object first (most common for file drops from Finder)
+        if provider.canLoadObject(ofClass: URL.self) {
+            _ = provider.loadObject(ofClass: URL.self) { url, error in
+                if let error = error {
+                    print("FileDropZone: Error loading URL: \(error.localizedDescription)")
+                    return
+                }
+                guard let url = url else {
+                    print("FileDropZone: No URL received from provider")
                     return
                 }
                 DispatchQueue.main.async {
-                    onDrop(url)
+                    self.onDrop(url)
                 }
             }
             return true
         }
 
+        // Fallback: try loading as file URL type identifier
+        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
+            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
+                if let error = error {
+                    print("FileDropZone: Error loading file URL: \(error.localizedDescription)")
+                    return
+                }
+
+                if let url = item as? URL {
+                    DispatchQueue.main.async {
+                        self.onDrop(url)
+                    }
+                    return
+                }
+
+                if let data = item as? Data,
+                   let url = URL(dataRepresentation: data, relativeTo: nil) {
+                    DispatchQueue.main.async {
+                        self.onDrop(url)
+                    }
+                    return
+                }
+
+                print("FileDropZone: Could not convert dropped item to URL: \(type(of: item))")
+            }
+            return true
+        }
+
+        print("FileDropZone: Provider does not support URL or fileURL types")
         return false
     }
 }
