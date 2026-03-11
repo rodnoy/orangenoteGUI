@@ -15,3 +15,5 @@ target/
 # IDE
 .idea/
 .vscode/
+/.github/prompts/
+/.github/agents/

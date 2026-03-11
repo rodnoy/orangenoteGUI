@@ -1,0 +1,64 @@
+# OrangeNote — Task Tracker
+
+> A lightweight project task tracker. Keep this file up to date as you work on the project.
+
+---
+
+## How to Use
+
+1. **Add a task**: Write a new `- [ ]` item under the appropriate section with a priority emoji and date.
+2. **Start working**: Move the task from **📋 Backlog** to **🔄 In Progress**.
+3. **Complete a task**: Move it to **✅ Done**, check the box `- [x]`, and add the completion date.
+4. **Log an idea**: Drop rough thoughts into **💡 Ideas** — no format required.
+
+### Priority Markers
+
+| Marker | Meaning |
+|--------|---------|
+| 🔴     | High    |
+| 🟡     | Medium  |
+| 🟢     | Low     |
+
+### Date Format
+
+Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
+
+```
+- [ ] 🔴 Example task — *added: 2026-03-10*
+- [x] 🟢 Completed task — *added: 2026-03-01, done: 2026-03-05*
+```
+
+---
+
+## 📋 Backlog
+
+- [ ] 🔴 Add unit tests for `orangenote-core` transcription pipeline — *added: 2026-03-10*
+- [ ] 🟡 Implement drag-and-drop reordering in transcription segments view — *added: 2026-03-10*
+- [ ] 🟡 We should fix export text from speech analysis because when we change the source audio file, it keeps the old JSON file.
+- [ ] 🟢 Improve error messages shown to the user on FFI failures — *added: 2026-03-10*
+- [ ] 🟢 Add notification in mac notification center when job is DONE
+
+## 🔄 In Progress
+- [ ] 🟡 I want to update drag and drop interface because it doesn't work when I drop items there.
+
+- [ ] 🔴 We should add the menu item check for update and link it to the GitHub release version to fetch the newest one.
+
+
+- [ ] 🟡 Add localization support (i18n) for the macOS UI — *added: 2026-03-10*
+
+## ✅ Done
+
+<!-- Newest first -->
+
+- [x] 🔴 Define project architecture and document in `docs/ARCHITECTURE.md` — *added: 2026-03-01, done: 2026-03-10*
+- [x] 🟡 Scaffold Swift UI views and view models — *added: 2026-03-01, done: 2026-03-08*
+- [x] 🟢 Create initial `README.md` — *added: 2026-03-01, done: 2026-03-03*
+- [X] 🔴 Set up CI/CD pipeline with GitHub Actions — *added: 2026-03-10*
+## 💡 Ideas
+
+- Explore real-time microphone transcription as a future feature.
+- Consider a menu-bar-only mode for quick access.
+- Investigate smaller quantized Whisper models for faster cold-start.
+
+- Add app icon
+- We should add the translation function.And we should check if it's possible for free with Wisper.
