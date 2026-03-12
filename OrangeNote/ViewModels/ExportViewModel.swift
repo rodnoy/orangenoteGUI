@@ -48,12 +48,12 @@ final class ExportViewModel: ObservableObject {
         generateExport(result: result)
 
         guard let content = exportedContent else {
-            errorMessage = String(localized: "error.noContent")
+            errorMessage = L10n.localizedString("error.noContent")
             return
         }
 
         let panel = NSSavePanel()
-        panel.title = String(localized: "export.panelTitle")
+        panel.title = L10n.localizedString("export.panelTitle")
         panel.nameFieldStringValue = "transcription.\(selectedFormat.fileExtension)"
         panel.allowedContentTypes = [
             UTType(filenameExtension: selectedFormat.fileExtension) ?? .plainText
@@ -69,7 +69,7 @@ final class ExportViewModel: ObservableObject {
                     exportSuccess = false
                 }
             } catch {
-                errorMessage = String(format: String(localized: "error.saveFailed"), error.localizedDescription)
+                errorMessage = String(format: L10n.localizedString("error.saveFailed"), error.localizedDescription)
             }
         }
     }

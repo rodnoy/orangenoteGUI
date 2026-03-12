@@ -20,18 +20,13 @@ struct ResultsView: View {
     @State private var showFullText = false
 
     // Translation view model — only used on macOS 15+
-    private let translationVM: AnyObject?
-
-    init(result: TranscriptionResult?, exportVM: ExportViewModel) {
-        self.result = result
-        self.exportVM = exportVM
-
+    @State private var translationVM: AnyObject? = {
         if #available(macOS 15.0, *) {
-            self.translationVM = TranslationViewModel()
+            return TranslationViewModel()
         } else {
-            self.translationVM = nil
+            return nil
         }
-    }
+    }()
 
     var body: some View {
         Group {
@@ -142,7 +137,7 @@ struct ResultsView: View {
 
             // Stats
             HStack(spacing: 12) {
-                Label(String(format: String(localized: "results.segmentsCount"), result.segmentCount), systemImage: "text.alignleft")
+                Label(String(format: L10n.localizedString("results.segmentsCount"), result.segmentCount), systemImage: "text.alignleft")
                 Label(result.formattedDuration, systemImage: "clock")
             }
             .font(.caption)
@@ -309,12 +304,12 @@ private struct TranslationToolbarContent: View {
                     // Target language picker
                     Picker("translation.targetLanguage", selection: $translationVM.selectedTargetLanguage) {
                         ForEach(translationVM.availableLanguages) { lang in
-                            Text(String(localized: LocalizedStringResource(stringLiteral: lang.localizationKey)))
+                            Text(verbatim: L10n.localizedString(lang.localizationKey))
                                 .tag(lang.code)
                         }
                     }
                     .pickerStyle(.menu)
-                    .frame(maxWidth: 160)
+                    .frame(minWidth: 140)
 
                     // Translate button
                     if translationVM.isTranslating {
@@ -362,7 +357,7 @@ private struct TranslationToolbarContent: View {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(.yellow)
-                        Text(String(format: String(localized: "translation.error"), error))
+                        Text(String(format: L10n.localizedString("translation.error"), error))
                             .font(.caption)
                             .foregroundStyle(.red)
                         Spacer()

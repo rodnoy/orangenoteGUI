@@ -21,9 +21,33 @@ enum L10n {
         return Locale(identifier: settings.appLanguage)
     }
 
+    /// Resolves a localized string using the app's selected language setting.
+    ///
+    /// Use this in non-SwiftUI contexts (models, services) where
+    /// `LocalizedStringKey` and `.environment(\.locale)` are unavailable.
+    static func localizedString(_ key: String) -> String {
+        let settings = AppSettings()
+        let languageCode: String
+        if settings.appLanguage == "system" {
+            languageCode = Locale.current.language.languageCode?.identifier ?? "en"
+        } else {
+            languageCode = settings.appLanguage
+        }
+
+        guard let bundlePath = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
+              let bundle = Bundle(path: bundlePath) else {
+            return NSLocalizedString(key, comment: "")
+        }
+        return bundle.localizedString(forKey: key, value: nil, table: nil)
+    }
+
     /// Languages supported by the app UI, including the "system" meta-option.
+    ///
+    /// The system default entry uses a localization key that must be resolved
+    /// via `LocalizedStringKey` in SwiftUI views. Self-name entries (English,
+    /// Français, Русский) are intentionally not localized.
     static let supportedLanguages: [(code: String, name: String)] = [
-        ("system", "System Default"),
+        ("system", "settings.language.systemDefault"),
         ("en", "English"),
         ("fr", "Français"),
         ("ru", "Русский"),

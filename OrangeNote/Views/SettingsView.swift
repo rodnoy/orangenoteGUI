@@ -69,7 +69,7 @@ struct SettingsView: View {
 
                 Picker("settings.language.label", selection: $settings.language) {
                     ForEach(AppSettings.availableLanguages, id: \.code) { lang in
-                        Text(String(localized: String.LocalizationValue("lang.\(lang.code)"))).tag(lang.code)
+                        Text(verbatim: L10n.localizedString("lang.\(lang.code)")).tag(lang.code)
                     }
                 }
                 .pickerStyle(.menu)
@@ -124,7 +124,7 @@ struct SettingsView: View {
                             Text("settings.chunking.duration")
                                 .font(.subheadline)
                             Spacer()
-                            Text("\(settings.chunkDuration)s")
+                            (Text("\(settings.chunkDuration)") + Text(LocalizedStringKey("time.seconds.short")))
                                 .font(.subheadline.monospacedDigit())
                                 .foregroundStyle(.secondary)
                         }
@@ -142,7 +142,7 @@ struct SettingsView: View {
                             Text("settings.chunking.overlap")
                                 .font(.subheadline)
                             Spacer()
-                            Text("\(settings.overlapDuration)s")
+                            (Text("\(settings.overlapDuration)") + Text(LocalizedStringKey("time.seconds.short")))
                                 .font(.subheadline.monospacedDigit())
                                 .foregroundStyle(.secondary)
                         }
@@ -178,7 +178,11 @@ struct SettingsView: View {
 
                 Picker("settings.appLanguage.title", selection: $settings.appLanguage) {
                     ForEach(L10n.supportedLanguages, id: \.code) { lang in
-                        Text(lang.name).tag(lang.code)
+                        if lang.code == "system" {
+                            Text(verbatim: L10n.localizedString(lang.name)).tag(lang.code)
+                        } else {
+                            Text(lang.name).tag(lang.code)
+                        }
                     }
                 }
                 .pickerStyle(.menu)

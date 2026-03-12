@@ -59,7 +59,7 @@ struct UpdateAlertView: View {
             VStack(spacing: 8) {
                 Text("update.upToDate")
                     .font(.headline)
-                Text(String(format: String(localized: "update.latestVersion"), version))
+                Text(String(format: L10n.localizedString("update.latestVersion"), version))
                     .foregroundStyle(.secondary)
             }
 

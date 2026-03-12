@@ -16,7 +16,7 @@ enum NavigationItem: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    var title: LocalizedStringResource {
+    var titleKey: String {
         switch self {
         case .transcribe: return "nav.transcribe"
         case .results:    return "nav.results"
@@ -54,7 +54,7 @@ struct ContentView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 800, minHeight: 550)
-        .onChange(of: transcriptionVM.result) {
+        .onChange(of: transcriptionVM.result, initial: true) {
             appState.currentTranscriptionResult = transcriptionVM.result
         }
         .onChange(of: appState.triggerSave) {
@@ -73,7 +73,7 @@ struct ContentView: View {
 
     private var sidebar: some View {
         List(NavigationItem.allCases, selection: $selectedItem) { item in
-            Label(String(localized: item.title), systemImage: item.icon)
+            Label(LocalizedStringKey(item.titleKey), systemImage: item.icon)
                 .tag(item)
         }
         .listStyle(.sidebar)

@@ -111,7 +111,7 @@ struct TranscriptionView: View {
                 Label(settings.selectedModel, systemImage: "cpu")
                 Label(
                     settings.language == "auto"
-                        ? String(localized: "transcription.auto")
+                        ? L10n.localizedString("transcription.auto")
                         : settings.language.uppercased(),
                     systemImage: "globe"
                 )
@@ -186,10 +186,10 @@ struct TranscriptionView: View {
                 .font(.headline)
 
             HStack(spacing: 24) {
-                statItem(title: String(localized: "transcription.duration"), value: result.formattedDuration)
-                statItem(title: String(localized: "transcription.segments"), value: "\(result.segmentCount)")
-                statItem(title: String(localized: "transcription.words"), value: "\(result.wordCount)")
-                statItem(title: String(localized: "transcription.language"), value: result.language.uppercased())
+                statItem(title: LocalizedStringKey("transcription.duration"), value: result.formattedDuration)
+                statItem(title: LocalizedStringKey("transcription.segments"), value: "\(result.segmentCount)")
+                statItem(title: LocalizedStringKey("transcription.words"), value: "\(result.wordCount)")
+                statItem(title: LocalizedStringKey("transcription.language"), value: result.language.uppercased())
             }
         }
         .padding(16)
@@ -205,7 +205,7 @@ struct TranscriptionView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func statItem(title: String, value: String) -> some View {
+    private func statItem(title: LocalizedStringKey, value: String) -> some View {
         VStack(spacing: 2) {
             Text(value)
                 .font(.body.weight(.semibold).monospacedDigit())

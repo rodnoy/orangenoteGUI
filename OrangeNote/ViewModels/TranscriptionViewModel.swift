@@ -29,7 +29,7 @@ final class TranscriptionViewModel: ObservableObject {
     @Published var errorMessage: String?
 
     /// Current status message.
-    @Published var statusMessage: String = String(localized: "status.ready")
+    @Published var statusMessage: String = L10n.localizedString("status.ready")
 
     // MARK: - Private
 
@@ -63,7 +63,7 @@ final class TranscriptionViewModel: ObservableObject {
     /// Opens a file picker for audio files.
     func selectFile() {
         let panel = NSOpenPanel()
-        panel.title = String(localized: "transcription.selectFile")
+        panel.title = L10n.localizedString("transcription.selectFile")
         panel.allowedContentTypes = [
             UTType.audio,
             UTType.mpeg4Audio,
@@ -80,7 +80,7 @@ final class TranscriptionViewModel: ObservableObject {
             selectedFileURL = panel.url
             result = nil
             errorMessage = nil
-            statusMessage = String(localized: "status.fileSelected")
+            statusMessage = L10n.localizedString("status.fileSelected")
         }
     }
 
@@ -88,7 +88,7 @@ final class TranscriptionViewModel: ObservableObject {
     func handleDroppedFile(_ url: URL) {
         // Validate that the file exists and is accessible
         guard FileManager.default.fileExists(atPath: url.path) else {
-            errorMessage = String(localized: "error.fileNotFound")
+            errorMessage = L10n.localizedString("error.fileNotFound")
             return
         }
 
@@ -96,33 +96,33 @@ final class TranscriptionViewModel: ObservableObject {
         let validExtensions = ["mp3", "wav", "m4a", "flac", "ogg", "aac", "opus"]
         let fileExtension = url.pathExtension.lowercased()
         if !validExtensions.contains(fileExtension) {
-            errorMessage = String(format: String(localized: "error.unsupportedFormat"), fileExtension)
+            errorMessage = String(format: L10n.localizedString("error.unsupportedFormat"), fileExtension)
             return
         }
 
         selectedFileURL = url
         result = nil
         errorMessage = nil
-        statusMessage = String(localized: "status.fileSelected")
+            statusMessage = L10n.localizedString("status.fileSelected")
     }
 
     /// Starts the transcription process.
     func startTranscription(settings: AppSettings) {
         guard let fileURL = selectedFileURL else {
-            errorMessage = String(localized: "error.noFile")
+            errorMessage = L10n.localizedString("error.noFile")
             return
         }
 
         errorMessage = nil
         isTranscribing = true
         progress = 0.0
-        statusMessage = String(localized: "status.preparing")
+        statusMessage = L10n.localizedString("status.preparing")
 
         transcriptionTask = Task {
             do {
                 // Resolve model path
                 let modelPathString = try engine.modelPath(name: settings.selectedModel)
-                statusMessage = String(localized: "status.transcribing")
+                statusMessage = L10n.localizedString("status.transcribing")
 
                 let transcriptionResult: TranscriptionResult
 
@@ -158,7 +158,7 @@ final class TranscriptionViewModel: ObservableObject {
 
                 result = transcriptionResult
                 progress = 1.0
-                statusMessage = String(localized: "status.complete")
+                statusMessage = L10n.localizedString("status.complete")
 
                 NotificationService.sendTranscriptionComplete(
                     fileName: fileURL.lastPathComponent,
@@ -168,7 +168,7 @@ final class TranscriptionViewModel: ObservableObject {
             } catch {
                 if !Task.isCancelled {
                     errorMessage = error.localizedDescription
-                    statusMessage = String(localized: "status.failed")
+                    statusMessage = L10n.localizedString("status.failed")
                 }
             }
 
@@ -182,7 +182,7 @@ final class TranscriptionViewModel: ObservableObject {
         transcriptionTask = nil
         isTranscribing = false
         progress = 0.0
-        statusMessage = String(localized: "status.cancelled")
+        statusMessage = L10n.localizedString("status.cancelled")
     }
 
     /// Clears the current result and resets state.
@@ -190,6 +190,6 @@ final class TranscriptionViewModel: ObservableObject {
         result = nil
         progress = 0.0
         errorMessage = nil
-        statusMessage = String(localized: "status.ready")
+        statusMessage = L10n.localizedString("status.ready")
     }
 }

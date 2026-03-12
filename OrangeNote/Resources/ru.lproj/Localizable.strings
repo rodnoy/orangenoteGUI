@@ -85,6 +85,13 @@
 "models.notDownloaded" = "Не загружено";
 "models.error" = "Ошибка";
 "models.ok" = "OK";
+"models.downloaded" = "Загруженные модели";
+"models.noModels" = "Нет загруженных моделей";
+"models.noModels.description" = "Загрузите модели через CLI или поместите файлы .bin в директорию кэша ниже.";
+"models.showInFinder" = "Показать в Finder";
+"models.openCacheDir" = "Открыть директорию кэша";
+"models.cacheDir" = "Директория кэша";
+"models.filePath" = "Путь";
 
 // MARK: - Settings
 
@@ -108,6 +115,13 @@
 "settings.about.privacy" = "Вся обработка происходит на вашем устройстве. Данные не отправляются на внешние серверы.";
 "settings.appLanguage.title" = "Язык приложения";
 "settings.appLanguage.system" = "Системный";
+"settings.language.systemDefault" = "Системный по умолчанию";
+
+// MARK: - Time Units
+
+"time.hours.short" = "ч";
+"time.minutes.short" = "мин";
+"time.seconds.short" = "с";
 
 // MARK: - Whisper Model Names
 
@@ -196,6 +210,8 @@
 "notification.transcriptionComplete.title" = "Транскрипция завершена";
 "notification.transcriptionComplete.body" = "Файл «%1$@» успешно транскрибирован. Найдено сегментов: %2$d (%4$@).";
 "notification.transcriptionComplete.pluralSuffix" = "";
+"notification.translationComplete.title" = "Перевод завершён";
+"notification.translationComplete.body" = "Переведено %d сегментов на %@.";
 
 // MARK: - Translation
 

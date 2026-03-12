@@ -21,12 +21,16 @@ struct TranscriptionResult: Codable, Sendable, Equatable {
         let minutes = (totalSeconds % 3600) / 60
         let seconds = totalSeconds % 60
 
+        let h = L10n.localizedString("time.hours.short")
+        let m = L10n.localizedString("time.minutes.short")
+        let s = L10n.localizedString("time.seconds.short")
+
         if hours > 0 {
-            return "\(hours)h \(minutes)m \(seconds)s"
+            return "\(hours)\(h) \(minutes)\(m) \(seconds)\(s)"
         } else if minutes > 0 {
-            return "\(minutes)m \(seconds)s"
+            return "\(minutes)\(m) \(seconds)\(s)"
         }
-        return "\(seconds)s"
+        return "\(seconds)\(s)"
     }
 
     /// Number of segments in the result.

@@ -85,6 +85,13 @@
 "models.notDownloaded" = "Non téléchargé";
 "models.error" = "Erreur";
 "models.ok" = "OK";
+"models.downloaded" = "Modèles téléchargés";
+"models.noModels" = "Aucun modèle téléchargé";
+"models.noModels.description" = "Téléchargez les modèles via l'outil CLI ou placez les fichiers .bin dans le répertoire de cache ci-dessous.";
+"models.showInFinder" = "Afficher dans le Finder";
+"models.openCacheDir" = "Ouvrir le répertoire de cache";
+"models.cacheDir" = "Répertoire de cache";
+"models.filePath" = "Chemin";
 
 // MARK: - Settings
 
@@ -108,6 +115,13 @@
 "settings.about.privacy" = "Tout le traitement se fait sur votre appareil. Aucune donnée n'est envoyée à des serveurs externes.";
 "settings.appLanguage.title" = "Langue de l'application";
 "settings.appLanguage.system" = "Par défaut du système";
+"settings.language.systemDefault" = "Par défaut du système";
+
+// MARK: - Time Units
+
+"time.hours.short" = "h";
+"time.minutes.short" = "min";
+"time.seconds.short" = "s";
 
 // MARK: - Whisper Model Names
 
@@ -196,6 +210,8 @@
 "notification.transcriptionComplete.title" = "Transcription terminée";
 "notification.transcriptionComplete.body" = "Fichier « %1$@ » transcrit avec succès. %2$d segment%3$@ trouvé%3$@ (%4$@).";
 "notification.transcriptionComplete.pluralSuffix" = "s";
+"notification.translationComplete.title" = "Traduction terminée";
+"notification.translationComplete.body" = "%d segments traduits en %@.";
 
 // MARK: - Translation
 

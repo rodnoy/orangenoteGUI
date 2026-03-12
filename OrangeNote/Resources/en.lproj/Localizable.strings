@@ -85,6 +85,13 @@
 "models.notDownloaded" = "Not downloaded";
 "models.error" = "Error";
 "models.ok" = "OK";
+"models.downloaded" = "Downloaded Models";
+"models.noModels" = "No models downloaded";
+"models.noModels.description" = "Download models using the CLI tool or place .bin files in the cache directory below.";
+"models.showInFinder" = "Show in Finder";
+"models.openCacheDir" = "Open Cache Directory";
+"models.cacheDir" = "Cache Directory";
+"models.filePath" = "Path";
 
 // MARK: - Settings
 
@@ -108,6 +115,13 @@
 "settings.about.privacy" = "All processing happens on your device. No data is sent to external servers.";
 "settings.appLanguage.title" = "App Language";
 "settings.appLanguage.system" = "System Default";
+"settings.language.systemDefault" = "System Default";
+
+// MARK: - Time Units
+
+"time.hours.short" = "h";
+"time.minutes.short" = "m";
+"time.seconds.short" = "s";
 
 // MARK: - Whisper Model Names
 
@@ -196,6 +210,8 @@
 "notification.transcriptionComplete.title" = "Transcription Complete";
 "notification.transcriptionComplete.body" = "File '%1$@' transcribed successfully. %2$d segment%3$@ found (%4$@).";
 "notification.transcriptionComplete.pluralSuffix" = "s";
+"notification.translationComplete.title" = "Translation Complete";
+"notification.translationComplete.body" = "Translated %d segments to %@.";
 
 // MARK: - Translation
 

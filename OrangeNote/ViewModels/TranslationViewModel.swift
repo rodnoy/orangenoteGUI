@@ -154,6 +154,11 @@ final class TranslationViewModel: ObservableObject {
             )
 
             showTranslation = true
+
+            NotificationService.sendTranslationComplete(
+                targetLanguage: selectedTargetLanguage,
+                segmentCount: translatedSegments.count
+            )
         } catch {
             errorMessage = error.localizedDescription
         }

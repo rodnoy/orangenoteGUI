@@ -76,7 +76,8 @@ final class OrangeNoteEngine: Sendable {
                 id: info.name,
                 name: info.name,
                 size: Self.formatSize(mb: info.sizeMb),
-                isCached: info.cached
+                isCached: info.cached,
+                filePath: nil
             )
         }
     }

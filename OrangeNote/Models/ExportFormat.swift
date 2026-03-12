@@ -19,10 +19,10 @@ enum ExportFormat: String, CaseIterable, Identifiable, Sendable {
     /// Human-readable display name.
     var displayName: String {
         switch self {
-        case .txt:  return String(localized: "format.txt")
-        case .srt:  return String(localized: "format.srt")
-        case .vtt:  return String(localized: "format.vtt")
-        case .json: return String(localized: "format.json")
+        case .txt:  return L10n.localizedString("format.txt")
+        case .srt:  return L10n.localizedString("format.srt")
+        case .vtt:  return L10n.localizedString("format.vtt")
+        case .json: return L10n.localizedString("format.json")
         }
     }
 

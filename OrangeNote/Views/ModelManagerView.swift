@@ -2,12 +2,12 @@
 //  ModelManagerView.swift
 //  OrangeNote
 //
-//  Model download and management interface.
+//  Displays locally cached Whisper models with file paths and Finder integration.
 //
 
 import SwiftUI
 
-/// Displays available Whisper models with their download/cache status.
+/// Displays downloaded Whisper models with their file paths and Finder actions.
 struct ModelManagerView: View {
     @ObservedObject var viewModel: ModelManagerViewModel
 
@@ -15,10 +15,14 @@ struct ModelManagerView: View {
         VStack(spacing: 0) {
             if viewModel.isLoading {
                 loadingState
-            } else if viewModel.models.isEmpty {
+            } else if viewModel.cachedModels.isEmpty {
                 emptyState
             } else {
                 modelList
+            }
+
+            if let cacheDir = viewModel.cacheDirectory {
+                cacheDirFooter(cacheDir)
             }
         }
         .navigationTitle("models.title")
@@ -28,16 +32,6 @@ struct ModelManagerView: View {
                     Task { await viewModel.loadModels() }
                 } label: {
                     Label("models.refresh", systemImage: "arrow.clockwise")
-                }
-            }
-
-            if viewModel.cacheDirectory != nil {
-                ToolbarItem(placement: .secondaryAction) {
-                    Button {
-                        viewModel.openCacheDirectory()
-                    } label: {
-                        Label("models.openCache", systemImage: "folder")
-                    }
                 }
             }
         }
@@ -73,19 +67,19 @@ struct ModelManagerView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Image(systemName: "arrow.down.circle")
+            Image(systemName: "square.and.arrow.down.on.square")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("models.empty.title")
+            Text("models.noModels")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Button("models.retry") {
-                Task { await viewModel.loadModels() }
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
+            Text("models.noModels.description")
+                .font(.body)
+                .foregroundStyle(.tertiary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 400)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -95,8 +89,17 @@ struct ModelManagerView: View {
     private var modelList: some View {
         ScrollView {
             LazyVStack(spacing: 12) {
-                ForEach(viewModel.models) { model in
-                    modelRow(model)
+                Section {
+                    ForEach(viewModel.cachedModels) { model in
+                        modelRow(model)
+                    }
+                } header: {
+                    HStack {
+                        Text("models.downloaded")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                    }
                 }
             }
             .padding(16)
@@ -108,46 +111,48 @@ struct ModelManagerView: View {
     private func modelRow(_ model: WhisperModel) -> some View {
         HStack(spacing: 16) {
             // Model icon
-            Image(systemName: model.isCached ? "checkmark.circle.fill" : "arrow.down.circle")
+            Image(systemName: "checkmark.circle.fill")
                 .font(.title2)
-                .foregroundStyle(model.isCached ? .green : .orange)
+                .foregroundStyle(.green)
                 .frame(width: 32)
 
             // Model info
-            VStack(alignment: .leading, spacing: 2) {
-                Text(model.name.capitalized)
-                    .font(.body.weight(.medium))
-
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
+                    Text(model.name.capitalized)
+                        .font(.body.weight(.medium))
+
                     Text(model.size)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
 
-                    if model.isCached {
-                        Text("models.cached")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.green)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 1)
-                            .background {
-                                Capsule()
-                                    .fill(Color.green.opacity(0.1))
-                            }
+                if let filePath = model.filePath {
+                    HStack(spacing: 4) {
+                        Text("models.filePath")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                        Text(abbreviatePath(filePath))
+                            .font(.caption2.monospaced())
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.middle)
                     }
                 }
             }
 
             Spacer()
 
-            // Status / action
-            if model.isCached {
-                Image(systemName: "checkmark")
-                    .foregroundStyle(.green)
-                    .font(.body.weight(.medium))
-            } else {
-                Text("models.notDownloaded")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+            // Show in Finder button
+            if model.filePath != nil {
+                Button {
+                    viewModel.openInFinder(model: model)
+                } label: {
+                    Label("models.showInFinder", systemImage: "folder")
+                        .font(.caption)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
         }
         .padding(12)
@@ -155,6 +160,52 @@ struct ModelManagerView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color(.controlBackgroundColor))
         }
+    }
+
+    // MARK: - Cache Directory Footer
+
+    private func cacheDirFooter(_ path: String) -> some View {
+        HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("models.cacheDir")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Text(abbreviatePath(path))
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.tertiary)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+
+            Spacer()
+
+            Button {
+                viewModel.openCacheDirectory()
+            } label: {
+                Label("models.openCacheDir", systemImage: "folder.badge.gearshape")
+                    .font(.caption)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background {
+            Rectangle()
+                .fill(Color(.windowBackgroundColor))
+                .shadow(color: .black.opacity(0.05), radius: 2, y: -1)
+        }
+    }
+
+    // MARK: - Helpers
+
+    /// Abbreviates a file path by replacing the home directory with `~`.
+    private func abbreviatePath(_ path: String) -> String {
+        let home = FileManager.default.homeDirectoryForCurrentUser.path
+        if path.hasPrefix(home) {
+            return "~" + path.dropFirst(home.count)
+        }
+        return path
     }
 }
 

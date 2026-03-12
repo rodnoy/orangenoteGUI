@@ -44,6 +44,36 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 <!-- Newest first -->
 
+### v0.1.4 — *2026-03-12*
+
+#### Localization Fixes
+- [x] 🟡 Fixed "System Default" language option not being localized (now properly translated in en/fr/ru) — *done: 2026-03-12*
+- [x] 🟡 Fixed hardcoded time suffixes (h/m/s) in duration display — now localized (e.g., "ч/мин/с" in Russian) — *done: 2026-03-12*
+- [x] 🟡 Fixed hardcoded "s" suffix in chunk/overlap duration settings — now uses localized time units — *done: 2026-03-12*
+- [x] 🟢 Added 10 new localization keys across all 3 language files — *done: 2026-03-12*
+
+#### Model Manager Redesign
+- [x] 🟡 Redesigned Model Manager to show only downloaded/cached models (removed misleading "Not downloaded" entries) — *done: 2026-03-12*
+- [x] 🟢 Added file path display for each cached model — *done: 2026-03-12*
+- [x] 🟢 Added "Show in Finder" button for each model to quickly locate model files — *done: 2026-03-12*
+- [x] 🟢 Added cache directory display with "Open Cache Directory" button — *done: 2026-03-12*
+- [x] 🟢 Removed unused download stub properties (downloadingModel, downloadProgress) — *done: 2026-03-12*
+- [x] 🟢 Added informative empty state when no models are cached — *done: 2026-03-12*
+
+#### Menu Fix
+- [x] 🟡 Fixed Save/Export menu items not triggering actions (added `initial: true` to onChange synchronization) — *done: 2026-03-12*
+
+#### Translation Fix
+- [x] 🟡 Fixed TranslationViewModel not being properly observed by SwiftUI (changed from `let` to `@State`) — *done: 2026-03-12*
+- [x] 🟡 Fixed translation language picker being too narrow (added `minWidth: 140`) — *done: 2026-03-12*
+- [x] 🟢 Added translation completion notification via NotificationService — *done: 2026-03-12*
+
+#### Localization Mechanism Overhaul
+- [x] 🟡 Replaced all `String(localized:)` calls with `LocalizedStringKey` (SwiftUI views) and `L10n.localizedString()` (non-SwiftUI contexts) — *done: 2026-03-12*
+- [x] 🟡 Fixed `LocalizedStringKey` interpolation issue causing `lang.fr` to display instead of localized names — *done: 2026-03-12*
+- [x] 🟢 Added `L10n.localizedString(_:)` helper for imperative localization with app-selected locale — *done: 2026-03-12*
+- [x] 🟢 Added 2 new notification localization keys (translation complete title/body) — *done: 2026-03-12*
+
 ### v0.1.3 — *2026-03-11*
 
 - [x] 🟡 Added full app localization (English, French, Russian) with system language detection and manual override in Settings — *done: 2026-03-11*

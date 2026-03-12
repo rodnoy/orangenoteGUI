@@ -21,8 +21,16 @@ struct WhisperModel: Identifiable, Sendable, Hashable {
     /// Whether the model file is available locally.
     let isCached: Bool
 
+    /// Full file-system path to the cached model file, if available.
+    let filePath: String?
+
     /// Returns a copy with updated cache status.
     func withCachedStatus(_ cached: Bool) -> WhisperModel {
-        WhisperModel(id: id, name: name, size: size, isCached: cached)
+        WhisperModel(id: id, name: name, size: size, isCached: cached, filePath: filePath)
+    }
+
+    /// Returns a copy with the given file path.
+    func withFilePath(_ path: String?) -> WhisperModel {
+        WhisperModel(id: id, name: name, size: size, isCached: isCached, filePath: path)
     }
 }
