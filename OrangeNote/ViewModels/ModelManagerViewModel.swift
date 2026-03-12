@@ -25,6 +25,12 @@ final class ModelManagerViewModel: ObservableObject {
     /// The model cache directory path.
     @Published var cacheDirectory: String?
 
+    /// Models currently being downloaded.
+    @Published var downloadingModels: Set<String> = []
+
+    /// Download progress for each model (0.0 to 1.0).
+    @Published var downloadProgress: [String: Double] = [:]
+
     // MARK: - Computed
 
     /// Only models that are downloaded and available locally.
@@ -79,9 +85,9 @@ final class ModelManagerViewModel: ObservableObject {
             print("[ModelManager] ERROR: filePath is nil for model \(model.id)")
             return
         }
-        
+
         let url = URL(fileURLWithPath: path)
-        
+
         // Check if file exists
         let fileExists = FileManager.default.fileExists(atPath: path)
         print("[ModelManager] Attempting to open in Finder:")
@@ -89,15 +95,49 @@ final class ModelManagerViewModel: ObservableObject {
         print("  - Path: \(path)")
         print("  - File exists: \(fileExists)")
         print("  - URL: \(url)")
-        
+
         if !fileExists {
             print("[ModelManager] ERROR: File does not exist at path")
             errorMessage = "File not found at: \(path)"
             return
         }
-        
+
         // Attempt to reveal in Finder
         NSWorkspace.shared.activateFileViewerSelecting([url])
         print("[ModelManager] NSWorkspace.activateFileViewerSelecting called")
+    }
+
+    /// Download a model.
+    func downloadModel(_ model: WhisperModel) {
+        guard !downloadingModels.contains(model.name) else { return }
+
+        downloadingModels.insert(model.name)
+        downloadProgress[model.name] = 0
+        errorMessage = nil
+
+        engine.downloadModel(name: model.name) { [weak self] progress in
+            self?.downloadProgress[model.name] = progress
+        } completion: { [weak self] result in
+            guard let self else { return }
+            self.downloadingModels.remove(model.name)
+            self.downloadProgress.removeValue(forKey: model.name)
+
+            switch result {
+            case .success:
+                Task { await self.loadModels() }
+            case .failure(let error):
+                self.errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    /// Delete a cached model.
+    func deleteModel(_ model: WhisperModel) {
+        do {
+            try engine.deleteModel(name: model.name)
+            Task { await loadModels() }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 }

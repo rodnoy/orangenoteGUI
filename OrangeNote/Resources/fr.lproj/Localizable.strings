@@ -93,6 +93,16 @@
 "models.cacheDir" = "Répertoire de cache";
 "models.filePath" = "Chemin";
 
+// MARK: - Model Download/Delete
+
+"models.download" = "Télécharger";
+"models.delete" = "Supprimer";
+"models.cancel" = "Annuler";
+"models.downloading" = "Téléchargement...";
+"models.deleteConfirm.title" = "Supprimer le modèle ?";
+"models.deleteConfirm.message" = "Le fichier du modèle sera supprimé de votre ordinateur. Vous pourrez le retélécharger plus tard.";
+"models.allModels" = "Tous les modèles";
+
 // MARK: - Settings
 
 "settings.title" = "Paramètres";
@@ -184,6 +194,8 @@
 // MARK: - Menu Commands
 
 "menu.checkUpdates" = "Rechercher des mises à jour...";
+"menu.testNotification" = "Notification de test";
+"menu.openTranscription" = "Ouvrir une transcription...";
 "menu.save" = "Enregistrer la transcription";
 "menu.export" = "Exporter la transcription…";
 
@@ -226,6 +238,13 @@
 "translation.unsupportedLanguage" = "Langue source non prise en charge pour la traduction";
 "translation.requiresMacOS15" = "Nécessite macOS 15 ou ultérieur";
 "translation.error" = "Échec de la traduction : %@";
+
+// MARK: - Import
+
+"import.panelTitle" = "Ouvrir un fichier de transcription";
+"import.error.unsupportedFormat" = "Format de fichier non pris en charge : %@";
+"import.error.parseError" = "Échec de l'analyse du fichier : %@";
+"import.error.fileReadError" = "Échec de la lecture du fichier : %@";
 
 // MARK: - Common
 

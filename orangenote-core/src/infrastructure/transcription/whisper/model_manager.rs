@@ -349,6 +349,75 @@ impl WhisperModelManager {
         Ok(())
     }
 
+    /// Delete a cached model file.
+    pub fn delete_model(&self, model: ModelSize) -> Result<()> {
+        let path = self.get_model_path(model);
+        if path.exists() {
+            fs::remove_file(&path).context(format!(
+                "Failed to delete model file at {}",
+                path.display()
+            ))?;
+        }
+        Ok(())
+    }
+
+    /// Download a model with progress callback (blocking, for FFI use).
+    ///
+    /// The callback receives (bytes_downloaded, total_bytes).
+    /// If total_bytes is 0, the total size is unknown.
+    pub fn download_model_with_progress<F>(
+        &self,
+        model: ModelSize,
+        progress: F,
+    ) -> Result<()>
+    where
+        F: Fn(u64, u64),
+    {
+        use std::io::Read;
+
+        // Ensure cache directory exists
+        fs::create_dir_all(&self.cache_dir).context("Failed to create model cache directory")?;
+
+        let model_path = self.get_model_path(model);
+        let url = self.source.download_url(model);
+
+        // Use ureq for simple blocking HTTP
+        let response = ureq::get(&url)
+            .call()
+            .map_err(|e| anyhow!("Failed to download model: {}", e))?;
+
+        let total_size = response
+            .header("Content-Length")
+            .and_then(|s| s.parse::<u64>().ok())
+            .unwrap_or(0);
+
+        let mut reader = response.into_reader();
+        let mut file = fs::File::create(&model_path).context(format!(
+            "Failed to create model file at {}",
+            model_path.display()
+        ))?;
+
+        let mut downloaded: u64 = 0;
+        let mut buffer = vec![0u8; 8192];
+
+        loop {
+            let bytes_read = reader
+                .read(&mut buffer)
+                .context("Failed to read from HTTP response")?;
+            if bytes_read == 0 {
+                break;
+            }
+
+            file.write_all(&buffer[..bytes_read])
+                .context("Failed to write to model file")?;
+
+            downloaded += bytes_read as u64;
+            progress(downloaded, total_size);
+        }
+
+        Ok(())
+    }
+
     /// Get human-readable model size string
     pub fn format_size(&self, model: ModelSize) -> String {
         format!("~{} MB", model.size_mb())

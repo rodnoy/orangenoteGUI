@@ -2,20 +2,23 @@
 //  ModelManagerView.swift
 //  OrangeNote
 //
-//  Displays locally cached Whisper models with file paths and Finder integration.
+//  Displays all available Whisper models with download, delete, and Finder integration.
 //
 
 import SwiftUI
 
-/// Displays downloaded Whisper models with their file paths and Finder actions.
+/// Displays all Whisper models with download/delete actions and cache status.
 struct ModelManagerView: View {
     @ObservedObject var viewModel: ModelManagerViewModel
+
+    @State private var showDeleteConfirmation = false
+    @State private var modelToDelete: WhisperModel?
 
     var body: some View {
         VStack(spacing: 0) {
             if viewModel.isLoading {
                 loadingState
-            } else if viewModel.cachedModels.isEmpty {
+            } else if viewModel.models.isEmpty {
                 emptyState
             } else {
                 modelList
@@ -47,6 +50,20 @@ struct ModelManagerView: View {
             Button("models.ok") { viewModel.errorMessage = nil }
         } message: {
             Text(viewModel.errorMessage ?? "")
+        }
+        .confirmationDialog(
+            "models.deleteConfirm.title",
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("models.delete", role: .destructive) {
+                if let model = modelToDelete {
+                    viewModel.deleteModel(model)
+                }
+            }
+            Button("models.cancel", role: .cancel) {}
+        } message: {
+            Text("models.deleteConfirm.message")
         }
     }
 
@@ -90,12 +107,12 @@ struct ModelManagerView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 Section {
-                    ForEach(viewModel.cachedModels) { model in
+                    ForEach(viewModel.models) { model in
                         modelRow(model)
                     }
                 } header: {
                     HStack {
-                        Text("models.downloaded")
+                        Text("models.allModels")
                             .font(.headline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -108,15 +125,47 @@ struct ModelManagerView: View {
 
     // MARK: - Model Row
 
+    @ViewBuilder
     private func modelRow(_ model: WhisperModel) -> some View {
-        HStack(spacing: 16) {
-            // Model icon
-            Image(systemName: "checkmark.circle.fill")
-                .font(.title2)
-                .foregroundStyle(.green)
-                .frame(width: 32)
+        if viewModel.downloadingModels.contains(model.name) {
+            downloadingRow(model)
+        } else if model.isCached {
+            cachedRow(model)
+        } else {
+            availableRow(model)
+        }
+    }
 
-            // Model info
+    /// Row for a model that is currently being downloaded.
+    private func downloadingRow(_ model: WhisperModel) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(model.name.capitalized)
+                    .font(.headline)
+                Text(model.size)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Button("models.cancel") {
+                    // Cancel not implemented yet — just show progress
+                }
+                .buttonStyle(.borderless)
+                .font(.caption)
+                .disabled(true)
+            }
+            ProgressView(value: viewModel.downloadProgress[model.name] ?? 0)
+                .progressViewStyle(.linear)
+        }
+        .padding(12)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(.controlBackgroundColor))
+        }
+    }
+
+    /// Row for a model that is cached locally.
+    private func cachedRow(_ model: WhisperModel) -> some View {
+        HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(model.name.capitalized)
@@ -125,35 +174,68 @@ struct ModelManagerView: View {
                     Text(model.size)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                        .font(.caption)
                 }
 
                 if let filePath = model.filePath {
-                    HStack(spacing: 4) {
-                        Text("models.filePath")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                        Text(abbreviatePath(filePath))
-                            .font(.caption2.monospaced())
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                    }
+                    Text(abbreviatePath(filePath))
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
                 }
             }
 
             Spacer()
 
-            // Show in Finder button
             if model.filePath != nil {
                 Button {
                     viewModel.openInFinder(model: model)
                 } label: {
-                    Label("models.showInFinder", systemImage: "folder")
-                        .font(.caption)
+                    Image(systemName: "folder")
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
+                .buttonStyle(.borderless)
+                .help("models.showInFinder")
             }
+
+            Button(role: .destructive) {
+                modelToDelete = model
+                showDeleteConfirmation = true
+            } label: {
+                Image(systemName: "trash")
+            }
+            .buttonStyle(.borderless)
+        }
+        .padding(12)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(.controlBackgroundColor))
+        }
+    }
+
+    /// Row for a model that is not yet downloaded.
+    private func availableRow(_ model: WhisperModel) -> some View {
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(model.name.capitalized)
+                    .font(.body.weight(.medium))
+                Text(model.size)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                viewModel.downloadModel(model)
+            } label: {
+                Label("models.download", systemImage: "arrow.down.circle")
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
         }
         .padding(12)
         .background {

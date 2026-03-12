@@ -13,11 +13,17 @@ final class AppState: ObservableObject {
     /// The current transcription result, if available.
     @Published var currentTranscriptionResult: TranscriptionResult?
 
+    /// Trigger flag for the Open Transcription menu command (⌘O).
+    @Published var triggerOpenTranscription: Bool = false
+
     /// Trigger flag for the Save menu command (⌘S).
     @Published var triggerSave: Bool = false
 
     /// Trigger flag for the Export menu command (⌘⇧E).
     @Published var triggerExport: Bool = false
+
+    /// Whether the export sheet is currently presented.
+    @Published var showExportSheet: Bool = false
 
     /// Whether a transcription result is currently available.
     var hasTranscriptionResult: Bool {

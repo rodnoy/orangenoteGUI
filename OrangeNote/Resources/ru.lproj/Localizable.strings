@@ -93,6 +93,16 @@
 "models.cacheDir" = "Директория кэша";
 "models.filePath" = "Путь";
 
+// MARK: - Model Download/Delete
+
+"models.download" = "Скачать";
+"models.delete" = "Удалить";
+"models.cancel" = "Отмена";
+"models.downloading" = "Загрузка...";
+"models.deleteConfirm.title" = "Удалить модель?";
+"models.deleteConfirm.message" = "Файл модели будет удалён с вашего компьютера. Вы сможете скачать его снова позже.";
+"models.allModels" = "Все модели";
+
 // MARK: - Settings
 
 "settings.title" = "Настройки";
@@ -184,6 +194,8 @@
 // MARK: - Menu Commands
 
 "menu.checkUpdates" = "Проверить обновления...";
+"menu.testNotification" = "Тестовое уведомление";
+"menu.openTranscription" = "Открыть транскрипцию...";
 "menu.save" = "Сохранить транскрипцию";
 "menu.export" = "Экспортировать транскрипцию…";
 
@@ -226,6 +238,13 @@
 "translation.unsupportedLanguage" = "Исходный язык не поддерживается для перевода";
 "translation.requiresMacOS15" = "Требуется macOS 15 или новее";
 "translation.error" = "Ошибка перевода: %@";
+
+// MARK: - Import
+
+"import.panelTitle" = "Открыть файл транскрипции";
+"import.error.unsupportedFormat" = "Неподдерживаемый формат файла: %@";
+"import.error.parseError" = "Ошибка разбора файла: %@";
+"import.error.fileReadError" = "Ошибка чтения файла: %@";
 
 // MARK: - Common
 

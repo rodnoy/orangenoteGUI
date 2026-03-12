@@ -7,8 +7,27 @@
 
 import UserNotifications
 
+/// Delegate that enables notification display while app is in foreground.
+final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = NotificationDelegate()
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        return [.banner, .sound]
+    }
+}
+
 /// Provides local notification capabilities for the application.
 enum NotificationService {
+    // MARK: - Setup
+
+    /// Installs the notification delegate so banners appear while the app is in foreground.
+    static func setupDelegate() {
+        UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
+    }
+
     // MARK: - Permission
 
     /// Requests notification authorization from the user.
@@ -96,6 +115,23 @@ enum NotificationService {
                 print("Failed to deliver notification: \(error.localizedDescription)")
             }
         }
+    }
+
+    // MARK: - Test
+
+    /// Sends a test notification to verify that notification delivery works.
+    static func sendTestNotification() {
+        let content = UNMutableNotificationContent()
+        content.title = "OrangeNote"
+        content.body = "Audio transcription app powered by Whisper. Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown")"
+        content.sound = .default
+
+        let request = UNNotificationRequest(
+            identifier: "test-notification-\(UUID().uuidString)",
+            content: content,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(request)
     }
 
     // MARK: - Private Helpers

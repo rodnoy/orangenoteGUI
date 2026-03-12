@@ -44,6 +44,31 @@ Use ISO 8601 dates: `YYYY-MM-DD`. Track *added* and optionally *done* dates.
 
 <!-- Newest first -->
 
+### v0.1.5 — *2026-03-12*
+
+#### Model Download/Delete
+- [x] 🔴 Added Rust FFI functions `orangenote_download_model` (with progress callback) and `orangenote_delete_model` — *done: 2026-03-12*
+- [x] 🟡 Added download progress bar in Model Manager UI — *done: 2026-03-12*
+- [x] 🟡 Added delete confirmation dialog for models — *done: 2026-03-12*
+- [x] 🟢 Added `ureq` dependency for blocking HTTP downloads — *done: 2026-03-12*
+
+#### Transcription Import
+- [x] 🟡 Added "File > Open Transcription..." (⌘O) menu item for importing saved transcription files — *done: 2026-03-12*
+- [x] 🟡 Added SRT parser with timestamp support — *done: 2026-03-12*
+- [x] 🟡 Added JSON import for native transcription format — *done: 2026-03-12*
+
+#### Translation & Notifications
+- [x] 🟡 Added linear progress indicator showing segment-by-segment translation progress — *done: 2026-03-12*
+- [x] 🟡 Fixed observation chain — `TranslationTaskModifier` now uses `@ObservedObject` for proper SwiftUI reactivity — *done: 2026-03-12*
+- [x] 🟢 Added test notification menu item ("OrangeNote > Test Notification") — *done: 2026-03-12*
+- [x] 🟢 Added `UNUserNotificationCenterDelegate` for foreground notification banner display — *done: 2026-03-12*
+
+#### Export & UI
+- [x] 🟡 Fixed "File > Export Transcription" to open save panel directly instead of just switching tabs — *done: 2026-03-12*
+- [x] 🟡 Redesigned Model Manager to show all models (downloaded and available) with download/delete actions — *done: 2026-03-12*
+- [x] 🟡 Redesigned model rows with three states: downloading (progress bar), cached (path + actions), available (download button) — *done: 2026-03-12*
+- [x] 🟢 Added 13 new localization keys across all 3 language files (en/fr/ru) — *done: 2026-03-12*
+
 ### v0.1.4 — *2026-03-12*
 
 #### Localization Fixes

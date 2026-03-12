@@ -91,7 +91,7 @@ struct ResultsView: View {
                 }
             }
         }
-        .modifier(TranslationTaskModifier(translationVM: translationVM))
+        .modifier(TranslationTaskWrapper(translationVM: translationVM))
     }
 
     // MARK: - Toolbar
@@ -313,11 +313,14 @@ private struct TranslationToolbarContent: View {
 
                     // Translate button
                     if translationVM.isTranslating {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text("translation.translating")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            ProgressView(value: translationVM.translationProgress)
+                                .progressViewStyle(.linear)
+                                .frame(width: 100)
+                            Text("translation.translating")
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     } else {
                         Button {
                             translationVM.translate(result: result)
@@ -381,20 +384,31 @@ private struct TranslationToolbarContent: View {
 
 // MARK: - Translation Task Modifier
 
-/// A view modifier that conditionally applies `.translationTask()` on macOS 15+.
-private struct TranslationTaskModifier: ViewModifier {
+/// A view modifier wrapper that handles `#available` check and delegates to `TranslationTaskModifier`.
+private struct TranslationTaskWrapper: ViewModifier {
     let translationVM: AnyObject?
 
     func body(content: Content) -> some View {
         if #available(macOS 15.0, *),
            let vm = translationVM as? TranslationViewModel {
             content
-                .translationTask(vm.translationConfiguration) { session in
-                    await vm.performTranslation(using: session)
-                }
+                .modifier(TranslationTaskModifier(vm: vm))
         } else {
             content
         }
+    }
+}
+
+/// Applies `.translationTask()` on macOS 15+ with proper `@ObservedObject` observation.
+@available(macOS 15.0, *)
+private struct TranslationTaskModifier: ViewModifier {
+    @ObservedObject var vm: TranslationViewModel
+
+    func body(content: Content) -> some View {
+        content
+            .translationTask(vm.translationConfiguration) { session in
+                await vm.performTranslation(using: session)
+            }
     }
 }
 

@@ -109,7 +109,7 @@ targets:
         CFBundleDisplayName: OrangeNote
         CFBundleIdentifier: com.orangenote.app
         CFBundleVersion: "1"
-        CFBundleShortVersionString: "0.1.4"
+        CFBundleShortVersionString: "0.1.5"
         CFBundlePackageType: APPL
         CFBundleExecutable: OrangeNote
         LSMinimumSystemVersion: "14.0"

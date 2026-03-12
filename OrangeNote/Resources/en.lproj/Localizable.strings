@@ -93,6 +93,16 @@
 "models.cacheDir" = "Cache Directory";
 "models.filePath" = "Path";
 
+// MARK: - Model Download/Delete
+
+"models.download" = "Download";
+"models.delete" = "Delete";
+"models.cancel" = "Cancel";
+"models.downloading" = "Downloading...";
+"models.deleteConfirm.title" = "Delete Model?";
+"models.deleteConfirm.message" = "This will remove the model file from your computer. You can download it again later.";
+"models.allModels" = "All Models";
+
 // MARK: - Settings
 
 "settings.title" = "Settings";
@@ -184,6 +194,8 @@
 // MARK: - Menu Commands
 
 "menu.checkUpdates" = "Check for Updates...";
+"menu.testNotification" = "Test Notification";
+"menu.openTranscription" = "Open Transcription...";
 "menu.save" = "Save Transcription";
 "menu.export" = "Export Transcription…";
 
@@ -226,6 +238,13 @@
 "translation.unsupportedLanguage" = "Source language not supported for translation";
 "translation.requiresMacOS15" = "Requires macOS 15 or later";
 "translation.error" = "Translation failed: %@";
+
+// MARK: - Import
+
+"import.panelTitle" = "Open Transcription File";
+"import.error.unsupportedFormat" = "Unsupported file format: %@";
+"import.error.parseError" = "Failed to parse file: %@";
+"import.error.fileReadError" = "Failed to read file: %@";
 
 // MARK: - Common
 

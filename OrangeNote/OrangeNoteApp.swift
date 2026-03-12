@@ -16,6 +16,7 @@ struct OrangeNoteApp: App {
 
     init() {
         NotificationService.requestPermission()
+        NotificationService.setupDelegate()
     }
 
     var body: some Scene {
@@ -31,6 +32,13 @@ struct OrangeNoteApp: App {
         .windowStyle(.titleBar)
         .defaultSize(width: 900, height: 600)
         .commands {
+            CommandGroup(replacing: .newItem) {
+                Button("menu.openTranscription") {
+                    appState.triggerOpenTranscription = true
+                }
+                .keyboardShortcut("o", modifiers: .command)
+            }
+
             CommandGroup(after: .appInfo) {
                 Button("menu.checkUpdates") {
                     Task {
@@ -39,6 +47,12 @@ struct OrangeNoteApp: App {
                 }
                 .keyboardShortcut("u", modifiers: .command)
                 .disabled(updateChecker.isChecking)
+
+                Divider()
+
+                Button("menu.testNotification") {
+                    NotificationService.sendTestNotification()
+                }
             }
 
             CommandGroup(after: .saveItem) {

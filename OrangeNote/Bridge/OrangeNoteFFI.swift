@@ -103,6 +103,60 @@ final class OrangeNoteEngine: Sendable {
         return String(cString: resultPtr)
     }
 
+    // MARK: - Model Download & Delete
+
+    /// Delete a cached model.
+    func deleteModel(name: String) throws {
+        var errorPtr: UnsafeMutablePointer<CChar>?
+        let success = name.withCString { namePtr in
+            orangenote_delete_model(namePtr, &errorPtr)
+        }
+        if !success {
+            let message = Self.consumeErrorString(errorPtr)
+            throw OrangeNoteFFIError.ffiError(message)
+        }
+    }
+
+    /// Download a model with progress reporting.
+    /// Runs on a background thread. Calls progressHandler on main thread.
+    func downloadModel(
+        name: String,
+        progressHandler: @escaping (Double) -> Void,
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            var errorPtr: UnsafeMutablePointer<CChar>?
+
+            let context = DownloadProgressContext(progressHandler)
+            let contextPtr = Unmanaged.passRetained(context).toOpaque()
+
+            let callback: @convention(c) (UInt64, UInt64, UnsafeMutableRawPointer?) -> Void = { downloaded, total, userData in
+                guard let userData else { return }
+                let ctx = Unmanaged<DownloadProgressContext>.fromOpaque(userData).takeUnretainedValue()
+                let progress = total > 0 ? Double(downloaded) / Double(total) : 0
+                DispatchQueue.main.async {
+                    ctx.progressHandler(progress)
+                }
+            }
+
+            let success = name.withCString { namePtr in
+                orangenote_download_model(namePtr, callback, contextPtr, &errorPtr)
+            }
+
+            // Release the retained context
+            Unmanaged<DownloadProgressContext>.fromOpaque(contextPtr).release()
+
+            DispatchQueue.main.async {
+                if success {
+                    completion(.success(()))
+                } else {
+                    let message = Self.consumeErrorString(errorPtr)
+                    completion(.failure(OrangeNoteFFIError.ffiError(message)))
+                }
+            }
+        }
+    }
+
     // MARK: - Transcription
 
     /// Transcribes an audio file using the specified model.
@@ -396,5 +450,16 @@ private final class ProgressContext: @unchecked Sendable {
 
     init(callback: @escaping @Sendable (Float) -> Void) {
         self.callback = callback
+    }
+}
+
+// MARK: - Download Progress Context
+
+/// Reference type used to pass a download progress handler through a C void pointer.
+private final class DownloadProgressContext: @unchecked Sendable {
+    let progressHandler: (Double) -> Void
+
+    init(_ handler: @escaping (Double) -> Void) {
+        self.progressHandler = handler
     }
 }

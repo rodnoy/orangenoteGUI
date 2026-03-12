@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Sidebar navigation items.
 enum NavigationItem: String, CaseIterable, Identifiable {
@@ -63,9 +64,15 @@ struct ContentView: View {
             exportVM.saveToFile(result: result)
         }
         .onChange(of: appState.triggerExport) {
-            guard appState.triggerExport else { return }
+            guard appState.triggerExport, let result = appState.currentTranscriptionResult else { return }
             appState.triggerExport = false
-            selectedItem = .results
+            // Open save panel directly with format selection
+            exportVM.saveToFile(result: result)
+        }
+        .onChange(of: appState.triggerOpenTranscription) {
+            guard appState.triggerOpenTranscription else { return }
+            appState.triggerOpenTranscription = false
+            openTranscriptionFile()
         }
     }
 
@@ -122,6 +129,29 @@ struct ContentView: View {
             Text("nav.selectSidebar")
                 .font(.title2)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - Import
+
+    /// Opens a file panel to import a transcription file (JSON or SRT).
+    private func openTranscriptionFile() {
+        let panel = NSOpenPanel()
+        panel.title = L10n.localizedString("import.panelTitle")
+        panel.allowedContentTypes = [
+            .json,
+            UTType(filenameExtension: "srt") ?? .plainText,
+        ]
+        panel.allowsMultipleSelection = false
+
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                let result = try TranscriptionImportService.importFromFile(url: url)
+                transcriptionVM.result = result
+                selectedItem = .results
+            } catch {
+                print("[Import] Error: \(error.localizedDescription)")
+            }
         }
     }
 }

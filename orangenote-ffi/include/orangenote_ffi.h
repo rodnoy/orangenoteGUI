@@ -103,6 +103,42 @@ char *orangenote_model_path(const char *model_name, char **error_out);
  */
 char *orangenote_list_models(char **error_out);
 
+/**
+ * Delete a cached model.
+ *
+ * @param model_name  Model name, e.g. "tiny", "base.en".
+ * @param error_out   On failure, receives an error string (caller frees).
+ * @return            true on success, false on error.
+ */
+bool orangenote_delete_model(const char *model_name, char **error_out);
+
+/**
+ * Progress callback for model downloads.
+ *
+ * @param downloaded  Bytes downloaded so far.
+ * @param total       Total bytes (0 if unknown).
+ * @param user_data   Opaque pointer passed through from the caller.
+ */
+typedef void (*DownloadProgressCallback)(uint64_t downloaded,
+                                         uint64_t total,
+                                         void *user_data);
+
+/**
+ * Download a model with progress reporting.
+ *
+ * Blocks until the download completes or fails.
+ *
+ * @param model_name         Model name, e.g. "tiny", "base.en".
+ * @param progress_callback  Optional progress callback (may be NULL).
+ * @param user_data          Opaque pointer forwarded to the callback.
+ * @param error_out          On failure, receives an error string (caller frees).
+ * @return                   true on success, false on error.
+ */
+bool orangenote_download_model(const char *model_name,
+                                DownloadProgressCallback progress_callback,
+                                void *user_data,
+                                char **error_out);
+
 /* ------------------------------------------------------------------------ */
 /* Transcription                                                            */
 /* ------------------------------------------------------------------------ */

@@ -274,6 +274,81 @@ pub extern "C" fn orangenote_list_models(error_out: *mut *mut c_char) -> *mut c_
     }
 }
 
+/// Delete a cached model.
+///
+/// Returns `true` on success, `false` on error.
+/// On error, `error_out` is set to a descriptive message.
+#[no_mangle]
+pub extern "C" fn orangenote_delete_model(
+    model_name: *const c_char,
+    error_out: *mut *mut c_char,
+) -> bool {
+    let result = catch_unwind(AssertUnwindSafe(|| -> Result<(), String> {
+        let name = unsafe { cstr_to_str(model_name) }?;
+        let size = ModelSize::from_str(name).map_err(|e| format!("{e:#}"))?;
+        let manager = WhisperModelManager::new().map_err(|e| format!("{e:#}"))?;
+        manager.delete_model(size).map_err(|e| format!("{e:#}"))
+    }));
+
+    match result {
+        Ok(Ok(())) => true,
+        Ok(Err(msg)) => {
+            set_error(error_out, &msg);
+            false
+        }
+        Err(_) => {
+            set_error(error_out, "panic in orangenote_delete_model");
+            false
+        }
+    }
+}
+
+/// Progress callback type for model downloads.
+///
+/// Parameters: (bytes_downloaded, total_bytes, user_data)
+/// If total_bytes is 0, the total size is unknown.
+pub type DownloadProgressCallback =
+    Option<extern "C" fn(downloaded: u64, total: u64, user_data: *mut c_void)>;
+
+/// Download a model with progress reporting.
+///
+/// This function blocks until the download completes or fails.
+/// The progress callback is called periodically with download progress.
+/// Returns `true` on success, `false` on error.
+#[no_mangle]
+pub extern "C" fn orangenote_download_model(
+    model_name: *const c_char,
+    progress_callback: DownloadProgressCallback,
+    user_data: *mut c_void,
+    error_out: *mut *mut c_char,
+) -> bool {
+    let result = catch_unwind(AssertUnwindSafe(|| -> Result<(), String> {
+        let name = unsafe { cstr_to_str(model_name) }?;
+        let size = ModelSize::from_str(name).map_err(|e| format!("{e:#}"))?;
+        let manager = WhisperModelManager::new().map_err(|e| format!("{e:#}"))?;
+
+        manager
+            .download_model_with_progress(size, |downloaded, total| {
+                if let Some(cb) = progress_callback {
+                    cb(downloaded, total, user_data);
+                }
+            })
+            .map_err(|e| format!("{e:#}"))
+    }));
+
+    match result {
+        Ok(Ok(())) => true,
+        Ok(Err(msg)) => {
+            set_error(error_out, &msg);
+            false
+        }
+        Err(_) => {
+            set_error(error_out, "panic in orangenote_download_model");
+            false
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Transcription
 // ---------------------------------------------------------------------------

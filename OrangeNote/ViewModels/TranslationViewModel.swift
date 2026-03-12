@@ -40,6 +40,9 @@ final class TranslationViewModel: ObservableObject {
     /// Whether to show translated text instead of original.
     @Published var showTranslation: Bool = false
 
+    /// Translation progress from 0.0 to 1.0 during batch segment translation.
+    @Published var translationProgress: Double = 0
+
     /// The translation configuration that triggers `.translationTask()` when set.
     @Published var translationConfiguration: TranslationSession.Configuration?
 
@@ -100,6 +103,7 @@ final class TranslationViewModel: ObservableObject {
         isTranslating = true
         errorMessage = nil
         showTranslation = false
+        translationProgress = 0
 
         let source = Locale.Language(identifier: sourceCode)
         let target = Locale.Language(identifier: targetCode)
@@ -127,10 +131,15 @@ final class TranslationViewModel: ObservableObject {
             }
 
             var translatedTexts = Array(repeating: "", count: pendingSegments.count)
+            let totalSegments = Double(pendingSegments.count)
+            var completedSegments = 0.0
+
             for try await response in session.translate(batch: requests) {
                 if let clientId = response.clientIdentifier,
                    let index = Int(clientId) {
                     translatedTexts[index] = response.targetText
+                    completedSegments += 1
+                    translationProgress = completedSegments / totalSegments
                 }
             }
 
@@ -172,6 +181,7 @@ final class TranslationViewModel: ObservableObject {
         showTranslation = false
         errorMessage = nil
         translationConfiguration = nil
+        translationProgress = 0
         pendingSegments = []
         pendingFullText = ""
         pendingSourceLanguage = ""
