@@ -30,6 +30,13 @@ final class AppSettings: ObservableObject {
     /// User-selected app language override ("system" follows system locale).
     @AppStorage("appLanguage") var appLanguage: String = "system"
 
+    init() {
+        // Migrate old "large" model name to "large-v3"
+        if selectedModel == "large" {
+            selectedModel = "large-v3"
+        }
+    }
+
     /// Available language options for the language picker.
     static let availableLanguages: [(code: String, name: String)] = [
         ("auto", "Auto-detect"),

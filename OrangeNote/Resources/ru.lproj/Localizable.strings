@@ -139,7 +139,8 @@
 "model.base" = "Base";
 "model.small" = "Small";
 "model.medium" = "Medium";
-"model.large" = "Large";
+"model.large-v3" = "Large v3 (~3 ГБ)";
+"model.large-v3-turbo" = "Large v3 Turbo (~1,6 ГБ)";
 
 // MARK: - Audio Languages
 

@@ -22,7 +22,8 @@ pub enum ModelSize {
     SmallEn,
     Medium,
     MediumEn,
-    Large,
+    LargeV3,
+    LargeV3Turbo,
 }
 
 impl ModelSize {
@@ -37,7 +38,8 @@ impl ModelSize {
             Self::SmallEn => "ggml-small.en.bin",
             Self::Medium => "ggml-medium.bin",
             Self::MediumEn => "ggml-medium.en.bin",
-            Self::Large => "ggml-large.bin",
+            Self::LargeV3 => "ggml-large-v3.bin",
+            Self::LargeV3Turbo => "ggml-large-v3-turbo.bin",
         }
     }
 
@@ -52,7 +54,8 @@ impl ModelSize {
             Self::SmallEn => "small.en",
             Self::Medium => "medium",
             Self::MediumEn => "medium.en",
-            Self::Large => "large",
+            Self::LargeV3 => "large-v3",
+            Self::LargeV3Turbo => "large-v3-turbo",
         }
     }
 
@@ -63,7 +66,8 @@ impl ModelSize {
             Self::Base | Self::BaseEn => 140,
             Self::Small | Self::SmallEn => 466,
             Self::Medium | Self::MediumEn => 1500,
-            Self::Large => 3000,
+            Self::LargeV3 => 3000,
+            Self::LargeV3Turbo => 1600,
         }
     }
 
@@ -78,9 +82,10 @@ impl ModelSize {
             "small.en" => Ok(Self::SmallEn),
             "medium" => Ok(Self::Medium),
             "medium.en" => Ok(Self::MediumEn),
-            "large" => Ok(Self::Large),
+            "large-v3" => Ok(Self::LargeV3),
+            "large-v3-turbo" => Ok(Self::LargeV3Turbo),
             _ => Err(anyhow!(
-                "Unknown model: {}. Available: tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large",
+                "Unknown model: {}. Available: tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large-v3, large-v3-turbo",
                 s
             )),
         }
@@ -286,7 +291,8 @@ impl WhisperModelManager {
             (ModelSize::SmallEn, ModelSize::SmallEn.size_mb()),
             (ModelSize::Medium, ModelSize::Medium.size_mb()),
             (ModelSize::MediumEn, ModelSize::MediumEn.size_mb()),
-            (ModelSize::Large, ModelSize::Large.size_mb()),
+            (ModelSize::LargeV3, ModelSize::LargeV3.size_mb()),
+            (ModelSize::LargeV3Turbo, ModelSize::LargeV3Turbo.size_mb()),
         ]
     }
 
@@ -451,27 +457,30 @@ mod tests {
     fn test_model_filenames() {
         assert_eq!(ModelSize::Tiny.filename(), "ggml-tiny.bin");
         assert_eq!(ModelSize::Base.filename(), "ggml-base.bin");
-        assert_eq!(ModelSize::Large.filename(), "ggml-large.bin");
+        assert_eq!(ModelSize::LargeV3.filename(), "ggml-large-v3.bin");
+        assert_eq!(ModelSize::LargeV3Turbo.filename(), "ggml-large-v3-turbo.bin");
     }
 
     #[test]
     fn test_model_display_names() {
         assert_eq!(ModelSize::Tiny.display_name(), "tiny");
         assert_eq!(ModelSize::TinyEn.display_name(), "tiny.en");
-        assert_eq!(ModelSize::Large.display_name(), "large");
+        assert_eq!(ModelSize::LargeV3.display_name(), "large-v3");
+        assert_eq!(ModelSize::LargeV3Turbo.display_name(), "large-v3-turbo");
     }
 
     #[test]
     fn test_available_models_count() {
         let models = WhisperModelManager::list_available_models();
-        assert_eq!(models.len(), 9); // tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large
+        assert_eq!(models.len(), 10); // tiny, tiny.en, base, base.en, small, small.en, medium, medium.en, large-v3, large-v3-turbo
     }
 
     #[test]
     fn test_model_sizes() {
         assert_eq!(ModelSize::Tiny.size_mb(), 39);
         assert_eq!(ModelSize::Base.size_mb(), 140);
-        assert_eq!(ModelSize::Large.size_mb(), 3000);
+        assert_eq!(ModelSize::LargeV3.size_mb(), 3000);
+        assert_eq!(ModelSize::LargeV3Turbo.size_mb(), 1600);
     }
 
     #[test]

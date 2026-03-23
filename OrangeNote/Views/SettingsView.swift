@@ -46,7 +46,8 @@ struct SettingsView: View {
                     Text("model.base").tag("base")
                     Text("model.small").tag("small")
                     Text("model.medium").tag("medium")
-                    Text("model.large").tag("large")
+                    Text("model.large-v3").tag("large-v3")
+                    Text("model.large-v3-turbo").tag("large-v3-turbo")
                 }
                 .pickerStyle(.menu)
 
