@@ -148,7 +148,12 @@ struct ContentView: View {
             do {
                 let result = try TranscriptionImportService.importFromFile(url: url)
                 transcriptionVM.result = result
-                selectedItem = .results
+                // Defer tab switch to the next RunLoop iteration so that
+                // NavigationSplitView picks up the updated result before
+                // the selection change triggers a detail-view rebuild.
+                Task { @MainActor in
+                    selectedItem = .results
+                }
             } catch {
                 print("[Import] Error: \(error.localizedDescription)")
             }
