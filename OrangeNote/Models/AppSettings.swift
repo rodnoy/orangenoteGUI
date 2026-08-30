@@ -2,38 +2,78 @@
 //  AppSettings.swift
 //  OrangeNote
 //
-//  Observable user settings persisted via AppStorage.
+//  Observable user settings persisted via UserDefaults.
 //
 
 import SwiftUI
 
 /// Application-wide settings persisted in UserDefaults.
 final class AppSettings: ObservableObject {
+    private let userDefaults: UserDefaults
+
     /// Selected Whisper model name (e.g. "base", "small", "medium").
-    @AppStorage("selectedModel") var selectedModel: String = "base"
+    @Published var selectedModel: String {
+        didSet { userDefaults.set(selectedModel, forKey: "selectedModel") }
+    }
 
     /// Language code for transcription ("auto" for auto-detection).
-    @AppStorage("language") var language: String = "auto"
+    @Published var language: String {
+        didSet { userDefaults.set(language, forKey: "language") }
+    }
 
     /// Whether to use chunked transcription for long files.
-    @AppStorage("useChunking") var useChunking: Bool = false
+    @Published var useChunking: Bool {
+        didSet { userDefaults.set(useChunking, forKey: "useChunking") }
+    }
 
     /// Duration of each chunk in seconds (when chunking is enabled).
-    @AppStorage("chunkDuration") var chunkDuration: Int = 30
+    @Published var chunkDuration: Int {
+        didSet { userDefaults.set(chunkDuration, forKey: "chunkDuration") }
+    }
 
     /// Overlap between chunks in seconds (when chunking is enabled).
-    @AppStorage("overlapDuration") var overlapDuration: Int = 5
+    @Published var overlapDuration: Int {
+        didSet { userDefaults.set(overlapDuration, forKey: "overlapDuration") }
+    }
 
     /// Whether to translate non-English audio to English using Whisper's built-in translate mode.
-    @AppStorage("translateToEnglish") var translateToEnglish: Bool = false
+    @Published var translateToEnglish: Bool {
+        didSet { userDefaults.set(translateToEnglish, forKey: "translateToEnglish") }
+    }
 
     /// User-selected app language override ("system" follows system locale).
-    @AppStorage("appLanguage") var appLanguage: String = "system"
+    @Published var appLanguage: String {
+        didSet {
+            userDefaults.set(appLanguage, forKey: "appLanguage")
+            syncAppleLanguages(for: appLanguage)
+            L10n.currentLanguage = appLanguage
+        }
+    }
 
-    init() {
-        // Migrate old "large" model name to "large-v3"
-        if selectedModel == "large" {
-            selectedModel = "large-v3"
+    init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+        let storedModel = userDefaults.string(forKey: "selectedModel") ?? "base"
+        self.selectedModel = (storedModel == "large") ? "large-v3" : storedModel
+        self.language = userDefaults.string(forKey: "language") ?? "auto"
+        self.useChunking = userDefaults.object(forKey: "useChunking") as? Bool ?? false
+        self.chunkDuration = userDefaults.object(forKey: "chunkDuration") as? Int ?? 30
+        self.overlapDuration = userDefaults.object(forKey: "overlapDuration") as? Int ?? 5
+        self.translateToEnglish = userDefaults.object(forKey: "translateToEnglish") as? Bool ?? false
+        let lang = userDefaults.string(forKey: "appLanguage") ?? "system"
+        self.appLanguage = lang
+        syncAppleLanguages(for: lang)
+        L10n.currentLanguage = lang
+    }
+
+    /// Synchronizes UserDefaults `AppleLanguages` with the selected language.
+    ///
+    /// For explicit languages ("en", "ru", "fr"), sets `[languageCode]` so the OS respects it on next launch.
+    /// For "system", removes the key so system choice applies on future process launches.
+    private func syncAppleLanguages(for language: String) {
+        if language == "system" {
+            userDefaults.removeObject(forKey: "AppleLanguages")
+        } else {
+            userDefaults.set([language], forKey: "AppleLanguages")
         }
     }
 

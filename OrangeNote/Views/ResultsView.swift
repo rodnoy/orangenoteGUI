@@ -13,11 +13,24 @@ import Translation
 
 /// Displays the transcription result with segment list, search, export, and translation options.
 struct ResultsView: View {
-    let result: TranscriptionResult?
+    /// The single atomic displayed transcription context (result + provenance), or
+    /// `nil` when no transcription is currently displayed (Task 2.20 / Finding F1).
+    ///
+    /// All rendering, copy, and export actions read from this exact same snapshot,
+    /// eliminating the prior pattern of pulling `result` from one source
+    /// (`TranscriptionViewModel.result`) and provenance from another
+    /// (`AppState.currentExecutionProvenance`) out-of-band, which could tear apart a
+    /// result from a mismatched provenance.
+    let displayedTranscription: DisplayedTranscription?
     @ObservedObject var exportVM: ExportViewModel
 
     @State private var searchText = ""
     @State private var showFullText = false
+
+    /// Convenience projection of the currently displayed domain result.
+    private var result: TranscriptionResult? {
+        displayedTranscription?.result
+    }
 
     // Translation view model — only used on macOS 15+
     @State private var translationVM: AnyObject? = {
@@ -36,7 +49,7 @@ struct ResultsView: View {
                 emptyState
             }
         }
-        .navigationTitle("results.title")
+        .navigationTitle(L10n.string("results.title"))
     }
 
     // MARK: - Empty State
@@ -47,11 +60,11 @@ struct ResultsView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("results.empty.title")
+            Text(L10n.string("results.empty.title"))
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Text("results.empty.subtitle")
+            Text(L10n.string("results.empty.subtitle"))
                 .font(.subheadline)
                 .foregroundStyle(.tertiary)
         }
@@ -99,10 +112,10 @@ struct ResultsView: View {
     private func toolbar(_ result: TranscriptionResult) -> some View {
         HStack(spacing: 12) {
             // View mode toggle
-            Picker("results.view", selection: $showFullText) {
-                Label("results.view.segments", systemImage: "list.bullet")
+            Picker(L10n.string("results.view"), selection: $showFullText) {
+                Label(L10n.string("results.view.segments"), systemImage: "list.bullet")
                     .tag(false)
-                Label("results.view.fullText", systemImage: "doc.plaintext")
+                Label(L10n.string("results.view.fullText"), systemImage: "doc.plaintext")
                     .tag(true)
             }
             .pickerStyle(.segmented)
@@ -113,7 +126,7 @@ struct ResultsView: View {
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.secondary)
-                    TextField("results.search", text: $searchText)
+                    TextField(L10n.string("results.search"), text: $searchText)
                         .textFieldStyle(.plain)
                     if !searchText.isEmpty {
                         Button {
@@ -137,7 +150,7 @@ struct ResultsView: View {
 
             // Stats
             HStack(spacing: 12) {
-                Label(String(format: L10n.localizedString("results.segmentsCount"), result.segmentCount), systemImage: "text.alignleft")
+                Label(String(format: L10n.string("results.segmentsCount"), result.segmentCount), systemImage: "text.alignleft")
                 Label(result.formattedDuration, systemImage: "clock")
             }
             .font(.caption)
@@ -145,19 +158,19 @@ struct ResultsView: View {
 
             // Copy button
             Menu {
-                Button("results.copyAll") {
+                Button(L10n.string("results.copyAll")) {
                     copyToClipboard(result.fullText)
                 }
-                Button("results.copyAsJson") {
+                Button(L10n.string("results.copyAsJson")) {
                     exportVM.selectedFormat = .json
-                    exportVM.copyToClipboard(result: result)
+                    exportVM.copyToClipboard(result: result, provenance: displayedTranscription?.provenance)
                 }
-                Button("results.copyAsSrt") {
+                Button(L10n.string("results.copyAsSrt")) {
                     exportVM.selectedFormat = .srt
-                    exportVM.copyToClipboard(result: result)
+                    exportVM.copyToClipboard(result: result, provenance: displayedTranscription?.provenance)
                 }
             } label: {
-                Label("results.copy", systemImage: "doc.on.doc")
+                Label(L10n.string("results.copy"), systemImage: "doc.on.doc")
             }
             .menuStyle(.borderlessButton)
             .frame(width: 80)
@@ -297,14 +310,14 @@ private struct TranslationToolbarContent: View {
         if canTranslate {
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
-                    Label("translation.title", systemImage: "character.book.closed")
+                    Label(L10n.string("translation.title"), systemImage: "character.book.closed")
                         .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
 
                     // Target language picker
-                    Picker("translation.targetLanguage", selection: $translationVM.selectedTargetLanguage) {
+                    Picker(L10n.string("translation.targetLanguage"), selection: $translationVM.selectedTargetLanguage) {
                         ForEach(translationVM.availableLanguages) { lang in
-                            Text(verbatim: L10n.localizedString(lang.localizationKey))
+                            Text(L10n.string(lang.localizationKey))
                                 .tag(lang.code)
                         }
                     }
@@ -317,7 +330,7 @@ private struct TranslationToolbarContent: View {
                             ProgressView(value: translationVM.translationProgress)
                                 .progressViewStyle(.linear)
                                 .frame(width: 100)
-                            Text("translation.translating")
+                            Text(L10n.string("translation.translating"))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                         }
@@ -325,7 +338,7 @@ private struct TranslationToolbarContent: View {
                         Button {
                             translationVM.translate(result: result)
                         } label: {
-                            Label("translation.translate", systemImage: "arrow.triangle.2.circlepath")
+                            Label(L10n.string("translation.translate"), systemImage: "arrow.triangle.2.circlepath")
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
@@ -337,14 +350,14 @@ private struct TranslationToolbarContent: View {
                     if translationVM.translatedResult != nil {
                         Toggle(isOn: $translationVM.showTranslation) {
                             Text(translationVM.showTranslation
-                                 ? "translation.showOriginal"
-                                 : "translation.showTranslation")
+                                 ? L10n.string("translation.showOriginal")
+                                 : L10n.string("translation.showTranslation"))
                                 .font(.caption)
                         }
                         .toggleStyle(.switch)
                         .controlSize(.small)
 
-                        Button("translation.clear") {
+                        Button(L10n.string("translation.clear")) {
                             translationVM.clearTranslation()
                         }
                         .buttonStyle(.borderless)
@@ -416,22 +429,27 @@ private struct TranslationTaskModifier: ViewModifier {
 
 #Preview("With Results") {
     ResultsView(
-        result: TranscriptionResult(
-            segments: [
-                TranscriptionSegment(id: UUID(), startTime: 0, endTime: 5.2, text: "Hello, welcome to this demo."),
-                TranscriptionSegment(id: UUID(), startTime: 5.2, endTime: 10.8, text: "This is a sample transcription result."),
-                TranscriptionSegment(id: UUID(), startTime: 10.8, endTime: 15.0, text: "Each segment has timestamps."),
-            ],
-            fullText: "Hello, welcome to this demo. This is a sample transcription result. Each segment has timestamps.",
-            language: "en",
-            duration: 15.0
+        displayedTranscription: DisplayedTranscription(
+            result: TranscriptionResult(
+                segments: [
+                    TranscriptionSegment(id: UUID(), startTime: 0, endTime: 5.2, text: "Hello, welcome to this demo."),
+                    TranscriptionSegment(id: UUID(), startTime: 5.2, endTime: 10.8, text: "This is a sample transcription result."),
+                    TranscriptionSegment(id: UUID(), startTime: 10.8, endTime: 15.0, text: "Each segment has timestamps."),
+                ],
+                fullText: "Hello, welcome to this demo. This is a sample transcription result. Each segment has timestamps.",
+                language: "en",
+                duration: 15.0
+            ),
+            provenance: nil
         ),
         exportVM: ExportViewModel()
     )
+    .environmentObject(AppState())
     .frame(width: 700, height: 500)
 }
 
 #Preview("Empty") {
-    ResultsView(result: nil, exportVM: ExportViewModel())
+    ResultsView(displayedTranscription: nil, exportVM: ExportViewModel())
+        .environmentObject(AppState())
         .frame(width: 700, height: 500)
 }

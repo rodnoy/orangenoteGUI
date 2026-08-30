@@ -14,6 +14,7 @@ enum TranscriptionImportService {
         case unsupportedFormat(String)
         case parseError(String)
         case fileReadError(String)
+        case unsupportedSchemaVersion(Int)
 
         var errorDescription: String? {
             switch self {
@@ -23,18 +24,43 @@ enum TranscriptionImportService {
                 return String(format: L10n.localizedString("import.error.parseError"), detail)
             case .fileReadError(let detail):
                 return String(format: L10n.localizedString("import.error.fileReadError"), detail)
+            case .unsupportedSchemaVersion(let version):
+                return String(format: L10n.localizedString("import.error.unsupportedSchemaVersion"), version)
             }
         }
     }
 
+    /// Pairs an imported domain `TranscriptionResult` with any safe, honest execution
+    /// provenance metadata recovered from the import source (Task 2.16 / Finding R1).
+    ///
+    /// `provenance` is `nil` whenever the imported format carries no real model/engine
+    /// metadata (legacy JSON fallbacks, SRT), so callers never fabricate placeholder
+    /// values. When present, `provenance.sourceFileName` honestly reports the original
+    /// `source.fileName` while `provenance.sourceURL` is explicitly `nil` (Task 2.20 /
+    /// Finding F3), since no real file URL is recoverable from a Canonical import —
+    /// downstream export flows (`ExportViewModel`) read `sourceFileName` directly
+    /// instead of reconstructing it from a fabricated `sourceURL`.
+    struct ImportedTranscription {
+        let result: TranscriptionResult
+        let provenance: ExecutionProvenance?
+    }
+
     /// Import a transcription from a file URL.
     static func importFromFile(url: URL) throws -> TranscriptionResult {
+        try importWithProvenance(url: url).result
+    }
+
+    /// Import a transcription from a file URL, preserving any safe source metadata
+    /// (`source.fileName`, `engine.model`, `engine.id`) available from a Canonical JSON
+    /// v1 document as `ExecutionProvenance` (Task 2.16 / Finding R1). Legacy JSON and SRT
+    /// imports carry no such metadata and honestly report `provenance: nil`.
+    static func importWithProvenance(url: URL) throws -> ImportedTranscription {
         let ext = url.pathExtension.lowercased()
         switch ext {
         case "json":
             return try importJSON(url: url)
         case "srt":
-            return try importSRT(url: url)
+            return try ImportedTranscription(result: importSRT(url: url), provenance: nil)
         default:
             throw ImportError.unsupportedFormat(ext)
         }
@@ -42,7 +68,13 @@ enum TranscriptionImportService {
 
     // MARK: - JSON Import
 
-    private static func importJSON(url: URL) throws -> TranscriptionResult {
+    /// Minimal envelope used only to detect the presence and value of `schemaVersion`
+    /// without requiring the full Canonical document shape to decode successfully.
+    private struct SchemaVersionEnvelope: Decodable {
+        let schemaVersion: Int?
+    }
+
+    private static func importJSON(url: URL) throws -> ImportedTranscription {
         let data: Data
         do {
             data = try Data(contentsOf: url)
@@ -50,12 +82,71 @@ enum TranscriptionImportService {
             throw ImportError.fileReadError(error.localizedDescription)
         }
 
+        // Detect schemaVersion presence before deciding on a decoding strategy.
+        let schemaVersion = (try? JSONDecoder().decode(SchemaVersionEnvelope.self, from: data))?.schemaVersion
+
+        if let schemaVersion {
+            guard schemaVersion == 1 else {
+                throw ImportError.unsupportedSchemaVersion(schemaVersion)
+            }
+            do {
+                let document = try CanonicalTranscriptionSerializer.decode(data)
+                let result = CanonicalTranscriptionSerializer.makeResult(from: document)
+                // Preserve safe source metadata honestly: `sourceFileName` carries only
+                // the original file *name*, and `sourceURL` is explicitly `nil` rather
+                // than a fabricated `URL(fileURLWithPath:)` constructed from a bare
+                // filename (Task 2.20 / Finding F3) — no real file URL is recoverable
+                // from a Canonical import. Downstream exports still report the real
+                // fileName/model/engine.id without fabricating a path (Task 2.16 /
+                // Finding R1).
+                let provenance = ExecutionProvenance(
+                    sourceFileName: document.source.fileName,
+                    sourceURL: nil,
+                    modelName: document.engine.model,
+                    engineID: document.engine.id
+                )
+                return ImportedTranscription(result: result, provenance: provenance)
+            } catch {
+                throw ImportError.parseError(error.localizedDescription)
+            }
+        }
+
+        // Legacy fallback #1: plain Swift Codable `TranscriptionResult` shape.
+        if let result = try? JSONDecoder().decode(TranscriptionResult.self, from: data) {
+            return ImportedTranscription(result: result, provenance: nil)
+        }
+
+        // Legacy fallback #2: FFI exporter shape (`start_ms` / `end_ms` / `confidence`).
         do {
-            let result = try JSONDecoder().decode(TranscriptionResult.self, from: data)
-            return result
+            let ffiResult = try JSONDecoder().decode(FFITranscriptionResult.self, from: data)
+            return ImportedTranscription(result: makeResult(fromFFI: ffiResult), provenance: nil)
         } catch {
             throw ImportError.parseError(error.localizedDescription)
         }
+    }
+
+    /// Convert a legacy FFI exporter transcription result into the domain `TranscriptionResult`.
+    private static func makeResult(fromFFI ffiResult: FFITranscriptionResult) -> TranscriptionResult {
+        let segments = ffiResult.segments.map { ffiSegment in
+            TranscriptionSegment(
+                id: UUID(),
+                startTime: Double(ffiSegment.startMs) / 1000.0,
+                endTime: Double(ffiSegment.endMs) / 1000.0,
+                text: ffiSegment.text
+            )
+        }
+        let fullText = segments.map(\.text).joined(separator: " ")
+        // Compute duration as the maximum `endTime` across all segments rather than
+        // `segments.last?.endTime`, since legacy FFI exports are not guaranteed to be
+        // sorted by time (Finding B6).
+        let duration = segments.map(\.endTime).max() ?? 0.0
+
+        return TranscriptionResult(
+            segments: segments,
+            fullText: fullText,
+            language: ffiResult.language,
+            duration: duration
+        )
     }
 
     // MARK: - SRT Import

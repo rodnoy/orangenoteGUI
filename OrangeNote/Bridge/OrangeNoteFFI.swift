@@ -28,13 +28,53 @@ enum OrangeNoteFFIError: LocalizedError {
     }
 }
 
+// MARK: - WhisperEngineClient
+
+/// Narrow seam abstracting the subset of `OrangeNoteEngine` operations
+/// consumed by `WhisperTranscriptionEngine` (Task 2.12 / finding B2).
+///
+/// This protocol exists purely at the Swift layer: it introduces no C ABI
+/// or Rust changes and is conformed to by the existing `OrangeNoteEngine`
+/// FFI wrapper. It allows `WhisperTranscriptionEngine` to be unit-tested
+/// with a lightweight in-memory test double instead of the real native
+/// Whisper library, while `OrangeNoteEngine` remains the sole production
+/// conformer used by default.
+protocol WhisperEngineClient: Sendable {
+    /// Returns the file-system path of a cached model.
+    ///
+    /// Declared `async` (even though `OrangeNoteEngine`'s implementation is
+    /// synchronous) so that actor-based test doubles can conform without
+    /// crossing actor isolation boundaries.
+    func modelPath(name: String) async throws -> String
+
+    /// Transcribes an audio file using the specified model (non-chunked).
+    func transcribeFile(
+        path: String,
+        modelPath: String,
+        language: String,
+        translate: Bool,
+        progressCallback: @escaping @Sendable (Float) -> Void
+    ) async throws -> TranscriptionResult
+
+    /// Transcribes an audio file using chunked processing for long files.
+    func transcribeFileChunked(
+        path: String,
+        modelPath: String,
+        language: String,
+        translate: Bool,
+        chunkSeconds: Int,
+        overlapSeconds: Int,
+        progressCallback: @escaping @Sendable (Float) -> Void
+    ) async throws -> TranscriptionResult
+}
+
 // MARK: - OrangeNoteEngine
 
 /// Thread-safe wrapper around the OrangeNote C FFI.
 ///
 /// All heavy FFI calls are dispatched to a background queue.
 /// Progress callbacks are routed back to the caller via Swift closures.
-final class OrangeNoteEngine: Sendable {
+final class OrangeNoteEngine: WhisperEngineClient {
 
     // MARK: - JSON Decoder
 

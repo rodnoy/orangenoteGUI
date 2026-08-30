@@ -28,13 +28,13 @@ struct ModelManagerView: View {
                 cacheDirFooter(cacheDir)
             }
         }
-        .navigationTitle("models.title")
+        .navigationTitle(L10n.string("models.title"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
                     Task { await viewModel.loadModels() }
                 } label: {
-                    Label("models.refresh", systemImage: "arrow.clockwise")
+                    Label(L10n.string("models.refresh"), systemImage: "arrow.clockwise")
                 }
             }
         }
@@ -43,27 +43,27 @@ struct ModelManagerView: View {
                 await viewModel.loadModels()
             }
         }
-        .alert("models.error", isPresented: .init(
+        .alert(L10n.string("models.error"), isPresented: .init(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
-            Button("models.ok") { viewModel.errorMessage = nil }
+            Button(L10n.string("models.ok")) { viewModel.errorMessage = nil }
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
         .confirmationDialog(
-            "models.deleteConfirm.title",
+            L10n.string("models.deleteConfirm.title"),
             isPresented: $showDeleteConfirmation,
             titleVisibility: .visible
         ) {
-            Button("models.delete", role: .destructive) {
+            Button(L10n.string("models.delete"), role: .destructive) {
                 if let model = modelToDelete {
                     viewModel.deleteModel(model)
                 }
             }
-            Button("models.cancel", role: .cancel) {}
+            Button(L10n.string("models.cancel"), role: .cancel) {}
         } message: {
-            Text("models.deleteConfirm.message")
+            Text(L10n.string("models.deleteConfirm.message"))
         }
     }
 
@@ -73,7 +73,7 @@ struct ModelManagerView: View {
         VStack(spacing: 16) {
             ProgressView()
                 .controlSize(.large)
-            Text("models.loading")
+            Text(L10n.string("models.loading"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -88,11 +88,11 @@ struct ModelManagerView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
 
-            Text("models.noModels")
+            Text(L10n.string("models.noModels"))
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            Text("models.noModels.description")
+            Text(L10n.string("models.noModels.description"))
                 .font(.body)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
@@ -112,7 +112,7 @@ struct ModelManagerView: View {
                     }
                 } header: {
                     HStack {
-                        Text("models.allModels")
+                        Text(L10n.string("models.allModels"))
                             .font(.headline)
                             .foregroundStyle(.primary)
                         Spacer()
@@ -146,7 +146,7 @@ struct ModelManagerView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Button("models.cancel") {
+                Button(L10n.string("models.cancel")) {
                     // Cancel not implemented yet — just show progress
                 }
                 .buttonStyle(.borderless)
@@ -198,7 +198,7 @@ struct ModelManagerView: View {
                     Image(systemName: "folder")
                 }
                 .buttonStyle(.borderless)
-                .help("models.showInFinder")
+                .help(L10n.string("models.showInFinder"))
             }
 
             Button(role: .destructive) {
@@ -232,7 +232,7 @@ struct ModelManagerView: View {
             Button {
                 viewModel.downloadModel(model)
             } label: {
-                Label("models.download", systemImage: "arrow.down.circle")
+                Label(L10n.string("models.download"), systemImage: "arrow.down.circle")
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
@@ -249,7 +249,7 @@ struct ModelManagerView: View {
     private func cacheDirFooter(_ path: String) -> some View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("models.cacheDir")
+                Text(L10n.string("models.cacheDir"))
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                 Text(abbreviatePath(path))
@@ -264,7 +264,7 @@ struct ModelManagerView: View {
             Button {
                 viewModel.openCacheDirectory()
             } label: {
-                Label("models.openCacheDir", systemImage: "folder.badge.gearshape")
+                Label(L10n.string("models.openCacheDir"), systemImage: "folder.badge.gearshape")
                     .font(.caption)
             }
             .buttonStyle(.bordered)

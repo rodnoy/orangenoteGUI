@@ -25,6 +25,7 @@ struct OrangeNoteApp: App {
                 .environmentObject(settings)
                 .environmentObject(appState)
                 .environment(\.locale, localeFromSettings)
+                .id(settings.appLanguage)
                 .sheet(isPresented: $updateChecker.showingUpdateSheet) {
                     UpdateAlertView(viewModel: updateChecker)
                 }
@@ -33,14 +34,14 @@ struct OrangeNoteApp: App {
         .defaultSize(width: 900, height: 600)
         .commands {
             CommandGroup(replacing: .newItem) {
-                Button("menu.openTranscription") {
+                Button(L10n.string("menu.openTranscription")) {
                     appState.triggerOpenTranscription = true
                 }
                 .keyboardShortcut("o", modifiers: .command)
             }
 
             CommandGroup(after: .appInfo) {
-                Button("menu.checkUpdates") {
+                Button(L10n.string("menu.checkUpdates")) {
                     Task {
                         await updateChecker.checkForUpdates()
                     }
@@ -50,19 +51,19 @@ struct OrangeNoteApp: App {
 
                 Divider()
 
-                Button("menu.testNotification") {
+                Button(L10n.string("menu.testNotification")) {
                     NotificationService.sendTestNotification()
                 }
             }
 
             CommandGroup(after: .saveItem) {
-                Button("menu.save") {
+                Button(L10n.string("menu.save")) {
                     appState.triggerSave = true
                 }
                 .keyboardShortcut("s", modifiers: .command)
                 .disabled(!appState.hasTranscriptionResult)
 
-                Button("menu.export") {
+                Button(L10n.string("menu.export")) {
                     appState.triggerExport = true
                 }
                 .keyboardShortcut("e", modifiers: [.command, .shift])
@@ -74,6 +75,7 @@ struct OrangeNoteApp: App {
             SettingsView()
                 .environmentObject(settings)
                 .environment(\.locale, localeFromSettings)
+                .id(settings.appLanguage)
                 .frame(minWidth: 450, minHeight: 400)
         }
     }

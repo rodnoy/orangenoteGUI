@@ -1,5 +1,6 @@
 .PHONY: setup generate build build-debug run clean open init \
        rust-build rust-build-arm64 rust-build-x86 rust-build-universal \
+       test test-rust test-swift gate regression-gate \
        release dmg
 
 # Install xcodegen if not present
@@ -59,6 +60,23 @@ clean:
 	cargo clean
 	rm -rf build/
 	xcodebuild -project OrangeNote.xcodeproj -scheme OrangeNote clean 2>/dev/null || true
+
+# Run Rust unit and integration tests
+test-rust:
+	cargo test --workspace
+
+# Run Swift unit and integration tests
+test-swift: generate
+	xcodebuild test -project OrangeNote.xcodeproj -scheme OrangeNote -destination 'platform=macOS'
+
+# Run full test suites (Rust + Swift)
+test: test-rust test-swift
+
+# Run full regression and quality gate (Rust tests + Swift tests + Build + Sandbox verification)
+gate:
+	@./scripts/regression-gate.sh
+
+regression-gate: gate
 
 # Generate and open in Xcode
 open: generate
