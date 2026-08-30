@@ -33,7 +33,9 @@
 
 // MARK: - File Drop Zone
 
-"dropzone.title" = "Déposez le fichier audio ici";
+"dropzone.chooseFolder" = "Choisir un dossier";
+
+"dropzone.title" = "Déposez les fichiers audio ou un dossier ici";
 "dropzone.or" = "ou";
 "dropzone.chooseFile" = "Choisir un fichier";
 "dropzone.formats" = "Prend en charge MP3, WAV, M4A, FLAC, OGG et plus";
@@ -209,10 +211,18 @@
 "status.complete" = "Transcription terminée";
 "status.failed" = "Échec de la transcription";
 "status.cancelled" = "Annulé";
+"status.cancelling" = "Annulation… en attente de l'arrêt du moteur";
 
 // MARK: - Error Messages
 
+"error.dropMixedItemsRejected" = "Impossible de déposer des fichiers et des dossiers ensemble, ou plusieurs dossiers. Veuillez déposer des fichiers audio ou un seul dossier.";
+"error.dropNoAudioFiles" = "Aucun fichier audio pris en charge trouvé dans la sélection ou le dossier déposé.";
+
 "error.noFile" = "Aucun fichier sélectionné";
+"error.dropMultipleFilesRejected" = "Un seul fichier est pris en charge. Veuillez déposer un seul fichier audio.";
+"error.dropRejectedTranscribing" = "Impossible d'accepter des fichiers déposés pendant la transcription.";
+"error.importRejectedTranscribing" = "Impossible d'importer une transcription pendant qu'une transcription est en cours.";
+"error.dropExtractionFailed" = "Impossible de lire le fichier déposé. Veuillez réessayer de le glisser ou utiliser le sélecteur de fichiers.";
 "error.fileNotFound" = "Fichier introuvable ou inaccessible";
 "error.unsupportedFormat" = "Format de fichier non pris en charge : .%@";
 "error.noContent" = "Aucun contenu à exporter";
@@ -246,9 +256,63 @@
 "import.error.unsupportedFormat" = "Format de fichier non pris en charge : %@";
 "import.error.parseError" = "Échec de l'analyse du fichier : %@";
 "import.error.fileReadError" = "Échec de la lecture du fichier : %@";
+"import.error.unsupportedSchemaVersion" = "Version de schéma non prise en charge : %d";
+"import.error.failed" = "Échec de l'importation du fichier de transcription : %@";
+"import.error.title" = "Échec de l'importation";
 
 // MARK: - Common
 
 "common.cancel" = "Annuler";
 "common.ok" = "OK";
 "common.dismiss" = "Fermer";
+
+// MARK: - Pickers
+
+"picker.selectAudioFiles" = "Sélectionner des fichiers audio";
+"picker.selectAudioFolder" = "Sélectionner un dossier audio";
+"picker.selectOutputDirectory" = "Sélectionner le dossier de destination";
+
+// MARK: - Batch
+
+"batch.status.queued" = "En file d'attente (%d fichiers audio)";
+"batch.status.runningItem" = "Transcription de %1$d sur %2$d : %3$@";
+"batch.status.cancelling" = "Annulation du traitement par lots…";
+"batch.status.cancelled" = "Traitement par lots annulé";
+"batch.status.completed" = "Traitement par lots terminé : %d sur %d réussis";
+"batch.error.singleFileBusy" = "Impossible de démarrer le traitement par lots pendant qu'une transcription individuelle est en cours.";
+"batch.error.emptyQueue" = "Aucun fichier audio dans la file d'attente.";
+"batch.error.noOutputDirectory" = "Aucun dossier de destination valide sélectionné.";
+
+"transcription.mode" = "Mode";
+"transcription.mode.single" = "Fichier unique";
+"transcription.mode.batch" = "Traitement par lots";
+"batch.queue.title" = "File d'attente";
+"batch.queue.empty" = "La file d'attente est vide";
+"batch.queue.emptySubtitle" = "Glissez des fichiers audio ou un dossier ici, ou utilisez les boutons ci-dessous";
+"batch.destination" = "Dossier de destination";
+"batch.destination.change" = "Modifier…";
+"batch.destination.source" = "Dossier source";
+"batch.destination.custom" = "Personnalisé";
+"batch.destination.override" = "Dossier sélectionné";
+"batch.destination.system" = "Dossier par défaut";
+"batch.destination.none" = "Aucun dossier de destination sélectionné";
+"batch.action.addFiles" = "Ajouter des fichiers…";
+"batch.action.addFolder" = "Ajouter un dossier…";
+"batch.action.clear" = "Vider la file";
+"batch.action.start" = "Démarrer le traitement";
+"batch.action.cancel" = "Annuler le traitement";
+"batch.action.cancelling" = "Annulation…";
+"batch.action.remove" = "Supprimer";
+"batch.status.item.queued" = "En file";
+"batch.status.item.transcribing" = "Transcription";
+"batch.status.item.saving" = "Enregistrement";
+"batch.status.item.succeeded" = "Terminé";
+"batch.status.item.failed" = "Échec";
+"batch.status.item.skipped" = "Ignoré (existe déjà)";
+"batch.status.item.cancelled" = "Annulé";
+"batch.summary.total" = "Total";
+"batch.summary.succeeded" = "Réussi";
+"batch.summary.failed" = "Échoué";
+"batch.summary.skipped" = "Ignoré";
+"batch.summary.queued" = "Restant";
+"batch.action.viewTranscript" = "Afficher la transcription dans les résultats";

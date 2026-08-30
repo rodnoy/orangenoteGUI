@@ -1,0 +1,19 @@
+{
+  "segments": [
+    {
+      "id": "9E3D0F4A-1B2C-4D5E-8F6A-7B8C9D0E1F2A",
+      "startTime": 0.0,
+      "endTime": 3.5,
+      "text": "Hello from legacy Swift Codable format."
+    },
+    {
+      "id": "1A2B3C4D-5E6F-4708-9192-A3B4C5D6E7F8",
+      "startTime": 3.5,
+      "endTime": 7.25,
+      "text": "This is the second segment."
+    }
+  ],
+  "fullText": "Hello from legacy Swift Codable format. This is the second segment.",
+  "language": "en",
+  "duration": 7.25
+}

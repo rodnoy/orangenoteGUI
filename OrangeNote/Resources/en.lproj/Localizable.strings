@@ -33,7 +33,9 @@
 
 // MARK: - File Drop Zone
 
-"dropzone.title" = "Drop Audio File Here";
+"dropzone.chooseFolder" = "Choose Folder";
+
+"dropzone.title" = "Drop Audio Files or Folder Here";
 "dropzone.or" = "or";
 "dropzone.chooseFile" = "Choose File";
 "dropzone.formats" = "Supports MP3, WAV, M4A, FLAC, OGG, and more";
@@ -209,10 +211,18 @@
 "status.complete" = "Transcription complete";
 "status.failed" = "Transcription failed";
 "status.cancelled" = "Cancelled";
+"status.cancelling" = "Cancelling… waiting for the engine to finish";
 
 // MARK: - Error Messages
 
+"error.dropMixedItemsRejected" = "Cannot drop files and folders together, or multiple folders. Please drop audio files or a single folder.";
+"error.dropNoAudioFiles" = "No supported audio files found in the dropped selection or folder.";
+
 "error.noFile" = "No file selected";
+"error.dropMultipleFilesRejected" = "Only 1 file is supported. Please drop a single audio file.";
+"error.dropRejectedTranscribing" = "Cannot accept dropped files while transcription is in progress.";
+"error.importRejectedTranscribing" = "Cannot import a transcript while transcription is in progress.";
+"error.dropExtractionFailed" = "Could not read the dropped file. Please try dragging it again or use the file picker.";
 "error.fileNotFound" = "File not found or not accessible";
 "error.unsupportedFormat" = "Unsupported file format: .%@";
 "error.noContent" = "No content to export";
@@ -246,9 +256,63 @@
 "import.error.unsupportedFormat" = "Unsupported file format: %@";
 "import.error.parseError" = "Failed to parse file: %@";
 "import.error.fileReadError" = "Failed to read file: %@";
+"import.error.unsupportedSchemaVersion" = "Unsupported schema version: %d";
+"import.error.failed" = "Failed to import transcription file: %@";
+"import.error.title" = "Import Failed";
 
 // MARK: - Common
 
 "common.cancel" = "Cancel";
 "common.ok" = "OK";
 "common.dismiss" = "Dismiss";
+
+// MARK: - Pickers
+
+"picker.selectAudioFiles" = "Select Audio Files";
+"picker.selectAudioFolder" = "Select Audio Folder";
+"picker.selectOutputDirectory" = "Select Output Folder";
+
+// MARK: - Batch
+
+"batch.status.queued" = "Queued (%d audio files)";
+"batch.status.runningItem" = "Transcribing %1$d of %2$d: %3$@";
+"batch.status.cancelling" = "Cancelling batch…";
+"batch.status.cancelled" = "Batch cancelled";
+"batch.status.completed" = "Batch complete: %d of %d succeeded";
+"batch.error.singleFileBusy" = "Cannot start batch while single-file transcription is in progress.";
+"batch.error.emptyQueue" = "No audio files in the batch queue.";
+"batch.error.noOutputDirectory" = "No valid output directory selected.";
+
+"transcription.mode" = "Mode";
+"transcription.mode.single" = "Single File";
+"transcription.mode.batch" = "Batch Processing";
+"batch.queue.title" = "Batch Queue";
+"batch.queue.empty" = "Queue is Empty";
+"batch.queue.emptySubtitle" = "Drag and drop audio files or a folder here, or use the buttons below";
+"batch.destination" = "Output Destination";
+"batch.destination.change" = "Change…";
+"batch.destination.source" = "Source folder";
+"batch.destination.custom" = "Custom";
+"batch.destination.override" = "Selected folder";
+"batch.destination.system" = "Default folder";
+"batch.destination.none" = "No output folder selected";
+"batch.action.addFiles" = "Add Files…";
+"batch.action.addFolder" = "Add Folder…";
+"batch.action.clear" = "Clear Queue";
+"batch.action.start" = "Start Batch";
+"batch.action.cancel" = "Cancel Batch";
+"batch.action.cancelling" = "Cancelling…";
+"batch.action.remove" = "Remove";
+"batch.status.item.queued" = "Queued";
+"batch.status.item.transcribing" = "Transcribing";
+"batch.status.item.saving" = "Saving";
+"batch.status.item.succeeded" = "Completed";
+"batch.status.item.failed" = "Failed";
+"batch.status.item.skipped" = "Skipped (exists)";
+"batch.status.item.cancelled" = "Cancelled";
+"batch.summary.total" = "Total";
+"batch.summary.succeeded" = "Succeeded";
+"batch.summary.failed" = "Failed";
+"batch.summary.skipped" = "Skipped";
+"batch.summary.queued" = "Remaining";
+"batch.action.viewTranscript" = "View transcript in Results";

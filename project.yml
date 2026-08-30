@@ -109,15 +109,32 @@ targets:
         CFBundleDisplayName: OrangeNote
         CFBundleIdentifier: com.orangenote.app
         CFBundleVersion: "1"
-        CFBundleShortVersionString: "0.1.5"
+        CFBundleShortVersionString: "0.2.0"
         CFBundlePackageType: APPL
         CFBundleExecutable: OrangeNote
         LSMinimumSystemVersion: "14.0"
         LSApplicationCategoryType: "public.app-category.productivity"
         NSHighResolutionCapable: true
+        CFBundleLocalizations:
+          - en
+          - ru
+          - fr
     entitlements:
       path: OrangeNote/OrangeNote.entitlements
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.network.client: true
-        com.apple.security.files.user-selected.read-only: true
+        com.apple.security.files.user-selected.read-write: true
+
+  OrangeNoteTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: OrangeNoteTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.orangenote.tests
+        DEVELOPMENT_LANGUAGE: en
+        GENERATE_INFOPLIST_FILE: true
+    dependencies:
+      - target: OrangeNote

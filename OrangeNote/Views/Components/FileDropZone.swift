@@ -2,21 +2,28 @@
 //  FileDropZone.swift
 //  OrangeNote
 //
-//  Drag-and-drop area for audio file selection with visual feedback.
+//  Drag-and-drop area for audio file and folder selection with visual feedback.
 //
 
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// A drop zone that accepts audio files via drag-and-drop.
+/// A drop zone that accepts audio files and folders via drag-and-drop.
+///
+/// This view is purely presentational: actual drop handling is attached at the
+/// page level (see `TranscriptionView`) so the drop target remains active across
+/// the entire view hierarchy, even after a file has been selected. `isTargeted`
+/// is driven externally by the page-level drop target so this view's highlight
+/// stays in sync with the shared drag-hover state.
 struct FileDropZone: View {
-    /// Called when a valid audio file is dropped.
-    let onDrop: (URL) -> Void
-
     /// Called when the "Choose File" button is tapped.
     let onChooseFile: () -> Void
 
-    @State private var isTargeted = false
+    /// Optional callback when "Choose Folder" is tapped.
+    var onChooseFolder: (() -> Void)? = nil
+
+    /// Whether the page-level drop target is currently being hovered by a drag (drives the visual highlight).
+    var isTargeted: Bool = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -25,22 +32,32 @@ struct FileDropZone: View {
                 .foregroundStyle(.orange)
                 .symbolEffect(.pulse, isActive: isTargeted)
 
-            Text("dropzone.title")
+            Text(L10n.string("dropzone.title"))
                 .font(.headline)
                 .foregroundStyle(.primary)
 
-            Text("dropzone.or")
+            Text(L10n.string("dropzone.or"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            Button(action: onChooseFile) {
-                Label("dropzone.chooseFile", systemImage: "folder.badge.plus")
-                    .font(.body.weight(.medium))
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
+            HStack(spacing: 12) {
+                Button(action: onChooseFile) {
+                    Label(L10n.string("dropzone.chooseFile"), systemImage: "doc.badge.plus")
+                        .font(.body.weight(.medium))
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.orange)
 
-            Text("dropzone.formats")
+                if let onChooseFolder = onChooseFolder {
+                    Button(action: onChooseFolder) {
+                        Label(L10n.string("dropzone.chooseFolder"), systemImage: "folder.badge.plus")
+                            .font(.body.weight(.medium))
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
+
+            Text(L10n.string("dropzone.formats"))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
         }
@@ -58,65 +75,7 @@ struct FileDropZone: View {
                         .fill(isTargeted ? Color.orange.opacity(0.05) : Color.clear)
                 }
         }
-        .onDrop(of: [.fileURL], isTargeted: $isTargeted) { providers in
-            handleDrop(providers: providers)
-        }
         .animation(.easeInOut(duration: 0.2), value: isTargeted)
-    }
-
-    // MARK: - Private
-
-    private func handleDrop(providers: [NSItemProvider]) -> Bool {
-        guard let provider = providers.first else { return false }
-
-        // Try loading as URL object first (most common for file drops from Finder)
-        if provider.canLoadObject(ofClass: URL.self) {
-            _ = provider.loadObject(ofClass: URL.self) { url, error in
-                if let error = error {
-                    print("FileDropZone: Error loading URL: \(error.localizedDescription)")
-                    return
-                }
-                guard let url = url else {
-                    print("FileDropZone: No URL received from provider")
-                    return
-                }
-                DispatchQueue.main.async {
-                    self.onDrop(url)
-                }
-            }
-            return true
-        }
-
-        // Fallback: try loading as file URL type identifier
-        if provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.fileURL.identifier, options: nil) { item, error in
-                if let error = error {
-                    print("FileDropZone: Error loading file URL: \(error.localizedDescription)")
-                    return
-                }
-
-                if let url = item as? URL {
-                    DispatchQueue.main.async {
-                        self.onDrop(url)
-                    }
-                    return
-                }
-
-                if let data = item as? Data,
-                   let url = URL(dataRepresentation: data, relativeTo: nil) {
-                    DispatchQueue.main.async {
-                        self.onDrop(url)
-                    }
-                    return
-                }
-
-                print("FileDropZone: Could not convert dropped item to URL: \(type(of: item))")
-            }
-            return true
-        }
-
-        print("FileDropZone: Provider does not support URL or fileURL types")
-        return false
     }
 }
 
@@ -124,9 +83,9 @@ struct FileDropZone: View {
 
 #Preview {
     FileDropZone(
-        onDrop: { url in print("Dropped: \(url)") },
-        onChooseFile: { print("Choose file tapped") }
+        onChooseFile: { print("Choose file tapped") },
+        onChooseFolder: { print("Choose folder tapped") }
     )
     .padding()
-    .frame(width: 400)
+    .frame(width: 450)
 }

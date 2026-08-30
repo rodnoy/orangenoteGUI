@@ -33,7 +33,9 @@
 
 // MARK: - File Drop Zone
 
-"dropzone.title" = "Перетащите аудиофайл сюда";
+"dropzone.chooseFolder" = "Выбрать папку";
+
+"dropzone.title" = "Перетащите аудиофайлы или папку сюда";
 "dropzone.or" = "или";
 "dropzone.chooseFile" = "Выбрать файл";
 "dropzone.formats" = "Поддерживает MP3, WAV, M4A, FLAC, OGG и другие";
@@ -209,10 +211,18 @@
 "status.complete" = "Транскрипция завершена";
 "status.failed" = "Ошибка транскрипции";
 "status.cancelled" = "Отменено";
+"status.cancelling" = "Отмена… ожидание завершения работы движка";
 
 // MARK: - Error Messages
 
+"error.dropMixedItemsRejected" = "Нельзя перетаскивать файлы и папки одновременно или несколько папок. Перетащите аудиофайлы или одну папку.";
+"error.dropNoAudioFiles" = "В выбранных элементах или папке не найдено поддерживаемых аудиофайлов.";
+
 "error.noFile" = "Файл не выбран";
+"error.dropMultipleFilesRejected" = "Поддерживается только 1 файл. Перетащите один аудиофайл.";
+"error.dropRejectedTranscribing" = "Нельзя добавлять файлы перетаскиванием во время транскрибации.";
+"error.importRejectedTranscribing" = "Нельзя импортировать транскрипцию во время транскрибации.";
+"error.dropExtractionFailed" = "Не удалось прочитать перетащенный файл. Попробуйте перетащить его ещё раз или выберите файл вручную.";
 "error.fileNotFound" = "Файл не найден или недоступен";
 "error.unsupportedFormat" = "Неподдерживаемый формат файла: .%@";
 "error.noContent" = "Нет содержимого для экспорта";
@@ -246,9 +256,63 @@
 "import.error.unsupportedFormat" = "Неподдерживаемый формат файла: %@";
 "import.error.parseError" = "Ошибка разбора файла: %@";
 "import.error.fileReadError" = "Ошибка чтения файла: %@";
+"import.error.unsupportedSchemaVersion" = "Неподдерживаемая версия схемы: %d";
+"import.error.failed" = "Не удалось импортировать файл транскрипции: %@";
+"import.error.title" = "Ошибка импорта";
 
 // MARK: - Common
 
 "common.cancel" = "Отмена";
 "common.ok" = "OK";
 "common.dismiss" = "Закрыть";
+
+// MARK: - Pickers
+
+"picker.selectAudioFiles" = "Выбрать аудиофайлы";
+"picker.selectAudioFolder" = "Выбрать папку с аудио";
+"picker.selectOutputDirectory" = "Выбрать папку для сохранения";
+
+// MARK: - Batch
+
+"batch.status.queued" = "В очереди (%d аудиофайлов)";
+"batch.status.runningItem" = "Транскрибирование %1$d из %2$d: %3$@";
+"batch.status.cancelling" = "Отмена пакетной обработки…";
+"batch.status.cancelled" = "Пакетная обработка отменена";
+"batch.status.completed" = "Пакетная обработка завершена: успешно %d из %d";
+"batch.error.singleFileBusy" = "Невозможно запустить пакетную обработку во время выполнения одиночной транскрипции.";
+"batch.error.emptyQueue" = "В очереди пакетной обработки нет аудиофайлов.";
+"batch.error.noOutputDirectory" = "Не выбрана папка для сохранения результатов.";
+
+"transcription.mode" = "Режим";
+"transcription.mode.single" = "Один файл";
+"transcription.mode.batch" = "Пакетная обработка";
+"batch.queue.title" = "Очередь файлов";
+"batch.queue.empty" = "Очередь пуста";
+"batch.queue.emptySubtitle" = "Перетащите аудиофайлы или папку сюда, либо используйте кнопки ниже";
+"batch.destination" = "Папка сохранения";
+"batch.destination.change" = "Изменить…";
+"batch.destination.source" = "Папка источника";
+"batch.destination.custom" = "Пользовательская";
+"batch.destination.override" = "Выбранная папка";
+"batch.destination.system" = "Папка по умолчанию";
+"batch.destination.none" = "Папка для сохранения не выбрана";
+"batch.action.addFiles" = "Добавить файлы…";
+"batch.action.addFolder" = "Добавить папку…";
+"batch.action.clear" = "Очистить очередь";
+"batch.action.start" = "Запустить пакет";
+"batch.action.cancel" = "Отменить пакет";
+"batch.action.cancelling" = "Отмена…";
+"batch.action.remove" = "Удалить";
+"batch.status.item.queued" = "В очереди";
+"batch.status.item.transcribing" = "Транскрибация";
+"batch.status.item.saving" = "Сохранение";
+"batch.status.item.succeeded" = "Завершено";
+"batch.status.item.failed" = "Ошибка";
+"batch.status.item.skipped" = "Пропущено (существует)";
+"batch.status.item.cancelled" = "Отменено";
+"batch.summary.total" = "Всего";
+"batch.summary.succeeded" = "Успешно";
+"batch.summary.failed" = "Ошибок";
+"batch.summary.skipped" = "Пропущено";
+"batch.summary.queued" = "Осталось";
+"batch.action.viewTranscript" = "Посмотреть расшифровку в Результатах";

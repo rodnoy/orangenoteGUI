@@ -2,28 +2,155 @@
 //  TranscriptionView.swift
 //  OrangeNote
 //
-//  File selection, transcription control, and progress display.
+//  File selection, batch queue management, transcription control, and progress display.
 //
 
 import SwiftUI
 
-/// The main transcription interface with file selection and progress tracking.
+/// Conceptual mode for the transcription screen.
+enum TranscriptionMode: String, CaseIterable, Identifiable {
+    case single
+    case batch
+
+    var id: String { rawValue }
+
+    var titleKey: String {
+        switch self {
+        case .single: return "transcription.mode.single"
+        case .batch: return "transcription.mode.batch"
+        }
+    }
+
+    var title: String {
+        L10n.string(titleKey)
+    }
+}
+
+/// The main transcription interface supporting single-file and batch modes with progress tracking.
+@MainActor
 struct TranscriptionView: View {
     @ObservedObject var viewModel: TranscriptionViewModel
+    @ObservedObject var batchViewModel: BatchTranscriptionViewModel
     @EnvironmentObject private var settings: AppSettings
+
+    /// Current mode (single file vs batch queue).
+    @State var selectedMode: TranscriptionMode
+
+    /// Whether a drag is currently hovering over the page-level drop target (Task 1.6 / 3.14).
+    @State private var isDropTargeted = false
+
+    init(
+        viewModel: TranscriptionViewModel,
+        batchViewModel: BatchTranscriptionViewModel,
+        initialMode: TranscriptionMode = .single
+    ) {
+        self.viewModel = viewModel
+        self.batchViewModel = batchViewModel
+        self._selectedMode = State(initialValue: initialMode)
+    }
+
+    init(
+        viewModel: TranscriptionViewModel,
+        initialMode: TranscriptionMode = .single
+    ) {
+        self.viewModel = viewModel
+        self.batchViewModel = BatchTranscriptionViewModel()
+        self._selectedMode = State(initialValue: initialMode)
+    }
+
+    private var isAnyBusy: Bool {
+        viewModel.isBusy || batchViewModel.isBusy
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
                 headerSection
-                fileSection
-                controlSection
-                progressSection
-                errorSection
+                modePickerSection
+
+                switch selectedMode {
+                case .single:
+                    fileSection
+                    controlSection
+                    progressSection
+                    errorSection
+                case .batch:
+                    BatchQueueSection(
+                        viewModel: batchViewModel,
+                        singleFileIsBusy: viewModel.isBusy,
+                        settings: settings
+                    )
+                }
             }
             .padding(24)
         }
-        .navigationTitle("transcription.title")
+        .navigationTitle(L10n.string("transcription.title"))
+        .overlay {
+            // Visual drop-target indicator shown for the entire page while a drag is hovering.
+            if isDropTargeted {
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.orange, style: StrokeStyle(lineWidth: 3, dash: [10, 5]))
+                    .background {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.orange.opacity(0.05))
+                    }
+                    .padding(8)
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: isDropTargeted)
+        // Page-level drop target (Tasks 1.6, 3.14): stays attached to the whole view regardless of
+        // whether a file is already selected, so users can drag files or folders at any time while idle.
+        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            handlePageDrop(providers: providers)
+        }
+    }
+
+    // MARK: - Drop Handling
+
+    private func handlePageDrop(providers: [NSItemProvider]) -> Bool {
+        guard !providers.isEmpty else { return false }
+
+        DropItemResolver.extractAndResolve(from: providers, isTranscribing: isAnyBusy) { resolution in
+            switch resolution {
+            case .accepted(let url):
+                // Re-check busy state at commit time (Task 1.13 / D010)
+                if isAnyBusy {
+                    if let message = DropResolution.rejectedTranscribing.localizedMessage {
+                        reportDropRejection(message)
+                    }
+                } else {
+                    if selectedMode == .batch {
+                        batchViewModel.ingestFiles([url])
+                    } else {
+                        viewModel.handleDroppedFile(url)
+                    }
+                }
+            case .batch(let ingestionResult):
+                if isAnyBusy {
+                    if let message = DropResolution.rejectedTranscribing.localizedMessage {
+                        reportDropRejection(message)
+                    }
+                } else {
+                    selectedMode = .batch
+                    batchViewModel.ingestResult(ingestionResult)
+                }
+            case .rejectedTranscribing, .rejectedMixedItems, .rejectedMultipleItems, .invalidFile, .noAudioFilesFound, .extractionFailed:
+                if let message = resolution.localizedMessage {
+                    reportDropRejection(message)
+                }
+            }
+        }
+        return true
+    }
+
+    private func reportDropRejection(_ message: String) {
+        if selectedMode == .batch {
+            viewModel.reportDropRejection(message)
+        } else {
+            viewModel.reportDropRejection(message)
+        }
     }
 
     // MARK: - Header
@@ -34,18 +161,30 @@ struct TranscriptionView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(.orange)
 
-            Text("transcription.header")
+            Text(L10n.string("transcription.header"))
                 .font(.title2.weight(.semibold))
 
-            Text("transcription.subtitle")
+            Text(L10n.string("transcription.subtitle"))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .padding(.bottom, 8)
+        .padding(.bottom, 4)
     }
 
-    // MARK: - File Selection
+    // MARK: - Mode Picker
+
+    private var modePickerSection: some View {
+        Picker(L10n.string("transcription.mode"), selection: $selectedMode) {
+            Text(L10n.string("transcription.mode.single")).tag(TranscriptionMode.single)
+            Text(L10n.string("transcription.mode.batch")).tag(TranscriptionMode.batch)
+        }
+        .pickerStyle(.segmented)
+        .frame(maxWidth: 300)
+        .disabled(isAnyBusy)
+    }
+
+    // MARK: - Single File: File Selection
 
     private var fileSection: some View {
         VStack(spacing: 12) {
@@ -59,19 +198,24 @@ struct TranscriptionView: View {
                 Button {
                     viewModel.selectFile()
                 } label: {
-                    Label("transcription.changeFile", systemImage: "arrow.triangle.2.circlepath")
+                    Label(L10n.string("transcription.changeFile"), systemImage: "arrow.triangle.2.circlepath")
                         .font(.caption)
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
+                .disabled(viewModel.isBusy)
             } else {
                 FileDropZone(
-                    onDrop: { url in
-                        viewModel.handleDroppedFile(url)
-                    },
                     onChooseFile: {
                         viewModel.selectFile()
-                    }
+                    },
+                    onChooseFolder: {
+                        selectedMode = .batch
+                        Task {
+                            await batchViewModel.promptAndIngestFolder()
+                        }
+                    },
+                    isTargeted: isDropTargeted
                 )
             }
         }
@@ -79,7 +223,7 @@ struct TranscriptionView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Controls
+    // MARK: - Single File: Controls
 
     private var controlSection: some View {
         VStack(spacing: 12) {
@@ -87,7 +231,7 @@ struct TranscriptionView: View {
                 Button(role: .destructive) {
                     viewModel.cancelTranscription()
                 } label: {
-                    Label("transcription.cancel", systemImage: "xmark.circle")
+                    Label(L10n.string("transcription.cancel"), systemImage: "xmark.circle")
                         .frame(minWidth: 160)
                 }
                 .buttonStyle(.borderedProminent)
@@ -97,26 +241,25 @@ struct TranscriptionView: View {
                 Button {
                     viewModel.startTranscription(settings: settings)
                 } label: {
-                    Label("transcription.start", systemImage: "play.fill")
+                    Label(L10n.string("transcription.start"), systemImage: "play.fill")
                         .frame(minWidth: 160)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.orange)
                 .controlSize(.large)
-                .disabled(!viewModel.canStartTranscription)
+                .disabled(!viewModel.canStartTranscription || batchViewModel.isBusy)
             }
 
             // Quick settings summary
             HStack(spacing: 16) {
                 Label(settings.selectedModel, systemImage: "cpu")
-                Label(
-                    settings.language == "auto"
-                        ? L10n.localizedString("transcription.auto")
-                        : settings.language.uppercased(),
-                    systemImage: "globe"
-                )
+                if settings.language == "auto" {
+                    Label(L10n.string("transcription.auto"), systemImage: "globe")
+                } else {
+                    Label(settings.language.uppercased(), systemImage: "globe")
+                }
                 if settings.useChunking {
-                    Label("transcription.chunked", systemImage: "rectangle.split.3x1")
+                    Label(L10n.string("transcription.chunked"), systemImage: "rectangle.split.3x1")
                 }
             }
             .font(.caption)
@@ -125,7 +268,7 @@ struct TranscriptionView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Progress
+    // MARK: - Single File: Progress
 
     @ViewBuilder
     private var progressSection: some View {
@@ -138,6 +281,15 @@ struct TranscriptionView: View {
             .frame(maxWidth: 400)
             .frame(maxWidth: .infinity)
             .transition(.opacity.combined(with: .move(edge: .top)))
+        } else if viewModel.isCancelling {
+            ProgressIndicator(
+                progress: 0,
+                statusMessage: viewModel.statusMessage,
+                isIndeterminate: true
+            )
+            .frame(maxWidth: 400)
+            .frame(maxWidth: .infinity)
+            .transition(.opacity.combined(with: .move(edge: .top)))
         }
 
         if let result = viewModel.result {
@@ -146,7 +298,7 @@ struct TranscriptionView: View {
         }
     }
 
-    // MARK: - Error
+    // MARK: - Single File: Error
 
     @ViewBuilder
     private var errorSection: some View {
@@ -158,8 +310,8 @@ struct TranscriptionView: View {
                     .font(.callout)
                     .foregroundStyle(.red)
                 Spacer()
-                Button("transcription.dismiss") {
-                    viewModel.errorMessage = nil
+                Button(L10n.string("transcription.dismiss")) {
+                    viewModel.dismissError()
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
@@ -174,7 +326,7 @@ struct TranscriptionView: View {
         }
     }
 
-    // MARK: - Completion Summary
+    // MARK: - Single File: Completion Summary
 
     private func completionSummary(_ result: TranscriptionResult) -> some View {
         VStack(spacing: 12) {
@@ -182,14 +334,14 @@ struct TranscriptionView: View {
                 .font(.system(size: 32))
                 .foregroundStyle(.green)
 
-            Text("transcription.complete")
+            Text(L10n.string("transcription.complete"))
                 .font(.headline)
 
             HStack(spacing: 24) {
-                statItem(title: LocalizedStringKey("transcription.duration"), value: result.formattedDuration)
-                statItem(title: LocalizedStringKey("transcription.segments"), value: "\(result.segmentCount)")
-                statItem(title: LocalizedStringKey("transcription.words"), value: "\(result.wordCount)")
-                statItem(title: LocalizedStringKey("transcription.language"), value: result.language.uppercased())
+                statItem(title: L10n.string("transcription.duration"), value: result.formattedDuration)
+                statItem(title: L10n.string("transcription.segments"), value: "\(result.segmentCount)")
+                statItem(title: L10n.string("transcription.words"), value: "\(result.wordCount)")
+                statItem(title: L10n.string("transcription.language"), value: result.language.uppercased())
             }
         }
         .padding(16)
@@ -205,7 +357,7 @@ struct TranscriptionView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func statItem(title: LocalizedStringKey, value: String) -> some View {
+    private func statItem(title: String, value: String) -> some View {
         VStack(spacing: 2) {
             Text(value)
                 .font(.body.weight(.semibold).monospacedDigit())
@@ -219,7 +371,10 @@ struct TranscriptionView: View {
 // MARK: - Preview
 
 #Preview {
-    TranscriptionView(viewModel: TranscriptionViewModel())
-        .environmentObject(AppSettings())
-        .frame(width: 600, height: 500)
+    TranscriptionView(
+        viewModel: TranscriptionViewModel(),
+        batchViewModel: BatchTranscriptionViewModel()
+    )
+    .environmentObject(AppSettings())
+    .frame(width: 600, height: 600)
 }
